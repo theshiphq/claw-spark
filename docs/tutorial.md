@@ -26,7 +26,7 @@ df -h /
 Open a terminal on your DGX Spark and run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash
+curl -fsSL https://clawspark.dev/install.sh | bash
 ```
 
 You'll see output like this:
@@ -438,4 +438,4 @@ Make sure you understand the security implications before doing this. Anyone on 
 - Always run `clawspark doctor` first. It catches 90% of issues.
 - Check `clawspark logs` for error messages.
 - Make sure your DGX Spark firmware is up to date.
-- If all else fails, `clawspark uninstall && curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash` gives you a clean start without losing conversation history.
+- If all else fails, `clawspark uninstall && curl -fsSL https://clawspark.dev/install.sh | bash` gives you a clean start without losing conversation history.

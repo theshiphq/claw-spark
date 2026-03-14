@@ -11,7 +11,7 @@
 **One command. Private AI assistant. Your hardware.**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash
+curl -fsSL https://clawspark.dev/install.sh | bash
 ```
 
 That's it. Go grab a coffee. Come back to a fully working, fully private AI assistant.
@@ -63,7 +63,7 @@ The installer asks you three things. That's it.
 Want zero interaction? Use `--defaults`
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash -s -- --defaults
+curl -fsSL https://clawspark.dev/install.sh | bash -s -- --defaults
 ```
 
 This picks Balanced model + WhatsApp + no Tailscale.

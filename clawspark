@@ -54,6 +54,9 @@ ${BOLD}Commands:${RESET}
   ${GREEN}logs${RESET}                Tail gateway logs
   ${GREEN}restart${RESET}             Restart Ollama and the gateway
   ${GREEN}uninstall${RESET}           Remove everything (with confirmation)
+  ${GREEN}tools${RESET}               List agent tools and their status
+  ${GREEN}tools enable <name>${RESET}  Enable an additional tool (e.g. email, browser)
+  ${GREEN}tools disable <name>${RESET} Disable a tool for the personal agent
   ${GREEN}help${RESET}                Show this help message
 
 USAGE
@@ -372,23 +375,19 @@ _cmd_update() {
     sudo npm install -g openclaw@latest 2>&1 | tee -a "${CLAWSPARK_LOG}"
     log_success "OpenClaw updated to $(openclaw --version 2>/dev/null || echo 'latest')."
 
-    # Re-apply patches (npm update overwrites dist files)
-    log_info "Re-applying patches..."
+    # Re-apply patches and dual-agent config (npm update overwrites dist files)
+    log_info "Re-applying patches and config..."
     local lib_dir="${CLAWSPARK_DIR}/lib"
     if [[ -f "${lib_dir}/setup-openclaw.sh" ]]; then
         source "${lib_dir}/setup-openclaw.sh"
         _patch_sync_full_history
         _patch_baileys_browser
         _patch_mention_detection
+        _setup_dual_agent_routing
     else
         log_warn "lib/setup-openclaw.sh not found -- patches not re-applied."
         log_warn "Re-run install.sh to apply patches."
     fi
-
-    # Re-apply config values that onboard/update may reset
-    log_info "Re-applying config..."
-    openclaw config set tools.profile full >> "${CLAWSPARK_LOG}" 2>&1 || true
-    openclaw config set tools.deny '["exec","write","edit","process","browser","cron","nodes","sessions_spawn"]' >> "${CLAWSPARK_LOG}" 2>&1 || true
 
     # Restart gateway with correct env
     log_info "Restarting gateway..."
@@ -678,6 +677,273 @@ _cmd_restart() {
     fi
 }
 
+# ── tools ───────────────────────────────────────────────────────────────────
+_cmd_tools() {
+    local subcmd="${1:-}"
+    shift || true
+
+    case "${subcmd}" in
+        enable)
+            local name="${1:-}"
+            [[ -z "${name}" ]] && { log_error "Usage: clawspark tools enable <tool>"; exit 1; }
+            _tools_enable "${name}"
+            ;;
+        disable)
+            local name="${1:-}"
+            [[ -z "${name}" ]] && { log_error "Usage: clawspark tools disable <tool>"; exit 1; }
+            _tools_disable "${name}"
+            ;;
+        *)
+            _tools_list
+            ;;
+    esac
+}
+
+_tools_list() {
+    printf '\n%s%s clawspark tools%s\n\n' "${BOLD}" "${BLUE}" "${RESET}"
+
+    local config_file="${HOME}/.openclaw/openclaw.json"
+
+    # Built-in tools that work out of the box
+    local -a builtin_tools=(
+        "exec:Shell commands (bash, docker, kubectl):yes"
+        "web_fetch:HTTP requests and web search via DDG:yes"
+        "read:Read files on the host:yes"
+        "write:Write and create files:yes"
+        "edit:Edit files in place:yes"
+        "message:WhatsApp / Telegram replies:yes"
+        "canvas:Interactive web UI:yes"
+        "process:List, monitor, kill processes:yes"
+        "cron:Scheduled tasks:yes"
+        "sessions_spawn:Sub-agent sessions:yes"
+        "nodes:Remote/paired node execution:yes"
+        "memory_search:Search stored context:yes"
+        "memory_store:Save info across sessions:yes"
+        "transcribe:Audio transcription (local Whisper):yes"
+        "vision:Image analysis (model-dependent):yes"
+    )
+
+    # Optional tools that need configuration
+    local -a optional_tools=(
+        "browser:Browser automation:needs chromium/chrome installed"
+        "email:Send and read emails:needs email account config"
+        "calendar:Calendar management:needs calendar integration"
+        "contacts:Contact lookup:needs contacts provider"
+        "image_generate:Text-to-image:needs image generation API"
+        "code_interpret:Sandboxed code runner:needs sandbox/Docker"
+        "webhook:Webhook management:needs webhook endpoints"
+    )
+
+    # Check which optional tools are currently enabled (not in deny list)
+    local personal_deny=""
+    if [[ -f "${config_file}" ]]; then
+        personal_deny=$(python3 -c "
+import json, sys
+with open(sys.argv[1]) as f:
+    cfg = json.load(f)
+agents = cfg.get('agents', {}).get('list', [])
+for a in agents:
+    if a.get('id') == 'personal':
+        deny = a.get('tools', {}).get('deny', [])
+        print(' '.join(deny))
+        break
+" "${config_file}" 2>/dev/null || echo "")
+    fi
+
+    printf '  %s%sBuilt-in (work out of the box):%s\n\n' "${BOLD}" "${GREEN}" "${RESET}"
+    for entry in "${builtin_tools[@]}"; do
+        IFS=: read -r name desc status <<< "${entry}"
+        if [[ " ${personal_deny} " == *" ${name} "* ]]; then
+            printf '    %s✗%s %-18s %s %s(disabled)%s\n' "${RED}" "${RESET}" "${name}" "${desc}" "${RED}" "${RESET}"
+        else
+            printf '    %s✓%s %-18s %s\n' "${GREEN}" "${RESET}" "${name}" "${desc}"
+        fi
+    done
+
+    printf '\n  %s%sOptional (need extra setup):%s\n\n' "${BOLD}" "${YELLOW}" "${RESET}"
+    for entry in "${optional_tools[@]}"; do
+        IFS=: read -r name desc requirement <<< "${entry}"
+        if [[ " ${personal_deny} " == *" ${name} "* ]]; then
+            printf '    %s✗%s %-18s %s %s(disabled)%s\n' "${RED}" "${RESET}" "${name}" "${desc}" "${RED}" "${RESET}"
+        else
+            printf '    %s-%s %-18s %s -- %s%s%s\n' "${YELLOW}" "${RESET}" "${name}" "${desc}" "${CYAN}" "${requirement}" "${RESET}"
+        fi
+    done
+
+    printf '\n  Enable:  clawspark tools enable <name>\n'
+    printf '  Disable: clawspark tools disable <name>\n\n'
+}
+
+_tools_enable() {
+    local tool="$1"
+    local config_file="${HOME}/.openclaw/openclaw.json"
+
+    if [[ ! -f "${config_file}" ]]; then
+        log_error "Config not found at ${config_file}. Run install.sh first."
+        exit 1
+    fi
+
+    # Setup instructions for optional tools
+    case "${tool}" in
+        browser)
+            log_info "Enabling browser tool..."
+            log_info "Requirement: Chromium or Chrome must be installed."
+            if check_command chromium-browser || check_command chromium || check_command google-chrome; then
+                log_success "Browser binary found."
+            else
+                log_warn "No browser binary found. Install with: sudo apt install chromium-browser"
+                log_warn "Enabling anyway -- install a browser before using the tool."
+            fi
+            ;;
+        web_search)
+            log_info "Enabling web_search tool..."
+            printf '  This requires a Brave Search API key.\n'
+            printf '  Get one at: https://brave.com/search/api/\n\n'
+            printf '  %sEnter your Brave API key (or press Enter to skip):%s ' "${CYAN}" "${RESET}"
+            local api_key
+            read -r api_key
+            if [[ -n "${api_key}" ]]; then
+                local env_file="${HOME}/.openclaw/gateway.env"
+                if ! grep -q 'BRAVE_API_KEY' "${env_file}" 2>/dev/null; then
+                    echo "BRAVE_API_KEY=${api_key}" >> "${env_file}"
+                else
+                    sed -i "s/BRAVE_API_KEY=.*/BRAVE_API_KEY=${api_key}/" "${env_file}"
+                fi
+                chmod 600 "${env_file}"
+                log_success "Brave API key saved to ${env_file}"
+                log_info "Restart the gateway: clawspark restart"
+            else
+                log_warn "No API key provided. web_search will not work without it."
+                log_warn "Enabling the tool config anyway."
+            fi
+            ;;
+        email)
+            log_info "Enabling email tool..."
+            printf '  Email requires IMAP/SMTP configuration in OpenClaw.\n'
+            printf '  After enabling, configure via the OpenClaw control UI:\n'
+            printf '    http://localhost:18789 -> Settings -> Integrations -> Email\n\n'
+            ;;
+        calendar)
+            log_info "Enabling calendar tool..."
+            printf '  Calendar requires Google or Outlook integration.\n'
+            printf '  After enabling, configure via the OpenClaw control UI:\n'
+            printf '    http://localhost:18789 -> Settings -> Integrations -> Calendar\n\n'
+            ;;
+        contacts)
+            log_info "Enabling contacts tool..."
+            printf '  After enabling, configure via the OpenClaw control UI:\n'
+            printf '    http://localhost:18789 -> Settings -> Integrations -> Contacts\n\n'
+            ;;
+        image_generate)
+            log_info "Enabling image_generate tool..."
+            printf '  Image generation requires an API (e.g. DALL-E, Stable Diffusion).\n'
+            printf '  After enabling, configure the provider in OpenClaw settings.\n\n'
+            ;;
+        code_interpret)
+            log_info "Enabling code_interpret tool..."
+            if check_command docker; then
+                log_success "Docker is available for sandboxed execution."
+            else
+                log_warn "Docker not found. code_interpret may run unsandboxed."
+            fi
+            ;;
+        webhook)
+            log_info "Enabling webhook tool..."
+            printf '  Configure webhook endpoints in OpenClaw settings after enabling.\n\n'
+            ;;
+        *)
+            # For built-in tools, just remove from deny list if present
+            log_info "Enabling ${tool}..."
+            ;;
+    esac
+
+    # Remove tool from personal agent's deny list (if present)
+    python3 -c "
+import json, sys
+
+tool_name = sys.argv[1]
+path = sys.argv[2]
+
+with open(path, 'r') as f:
+    cfg = json.load(f)
+
+agents = cfg.get('agents', {}).get('list', [])
+changed = False
+
+for agent in agents:
+    if agent.get('id') == 'personal':
+        deny = agent.get('tools', {}).get('deny', [])
+        if tool_name in deny:
+            deny.remove(tool_name)
+            if not deny:
+                agent['tools'].pop('deny', None)
+            changed = True
+        break
+
+if changed:
+    with open(path, 'w') as f:
+        json.dump(cfg, f, indent=2)
+    print('removed_from_deny')
+else:
+    print('not_in_deny')
+" "${tool}" "${config_file}" 2>> "${CLAWSPARK_LOG}" || true
+
+    log_success "Tool '${tool}' enabled for personal agent (DMs)."
+    log_info "Note: Group agent remains restricted (messaging-only). This is by design."
+    log_info "Restart to apply: clawspark restart"
+}
+
+_tools_disable() {
+    local tool="$1"
+    local config_file="${HOME}/.openclaw/openclaw.json"
+
+    if [[ ! -f "${config_file}" ]]; then
+        log_error "Config not found at ${config_file}. Run install.sh first."
+        exit 1
+    fi
+
+    # Don't allow disabling message tool
+    if [[ "${tool}" == "message" ]]; then
+        log_error "Cannot disable 'message' -- it's required for WhatsApp/Telegram."
+        exit 1
+    fi
+
+    log_info "Disabling ${tool} for personal agent..."
+
+    # Add tool to personal agent's deny list
+    python3 -c "
+import json, sys
+
+tool_name = sys.argv[1]
+path = sys.argv[2]
+
+with open(path, 'r') as f:
+    cfg = json.load(f)
+
+agents = cfg.get('agents', {}).get('list', [])
+
+for agent in agents:
+    if agent.get('id') == 'personal':
+        if 'tools' not in agent:
+            agent['tools'] = {}
+        deny = agent['tools'].get('deny', [])
+        if tool_name not in deny:
+            deny.append(tool_name)
+            agent['tools']['deny'] = deny
+        break
+
+with open(path, 'w') as f:
+    json.dump(cfg, f, indent=2)
+print('ok')
+" "${tool}" "${config_file}" 2>> "${CLAWSPARK_LOG}" || {
+        log_error "Failed to update config."
+        exit 1
+    }
+
+    log_success "Tool '${tool}' disabled for personal agent."
+    log_info "Restart to apply: clawspark restart"
+}
+
 # ── uninstall ───────────────────────────────────────────────────────────────
 _cmd_uninstall() {
     printf '\n%s%s clawspark uninstall%s\n\n' "${BOLD}" "${RED}" "${RESET}"
@@ -734,6 +1000,7 @@ shift || true
 case "${cmd}" in
     status)     _cmd_status ;;
     skills)     _cmd_skills "$@" ;;
+    tools)      _cmd_tools "$@" ;;
     benchmark)  _cmd_benchmark ;;
     update)     _cmd_update ;;
     dashboard)  _cmd_dashboard ;;

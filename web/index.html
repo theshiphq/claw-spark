@@ -331,6 +331,185 @@
     }
 
     /* ===================== */
+    /* SECURITY              */
+    /* ===================== */
+    .security {
+      background:
+        radial-gradient(ellipse 50% 35% at 70% 40%, rgba(118, 185, 0, 0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 20% 70%, rgba(255, 107, 53, 0.03) 0%, transparent 60%),
+        #0a0a0a;
+    }
+
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .security-item {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #1a1a1a;
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: all 0.3s ease;
+    }
+
+    .security-item:hover {
+      border-color: rgba(118, 185, 0, 0.2);
+      background: rgba(118, 185, 0, 0.03);
+      transform: translateY(-2px);
+    }
+
+    .security-icon {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(118, 185, 0, 0.1);
+      color: #76b900;
+    }
+
+    .security-item:nth-child(even) .security-icon {
+      background: rgba(255, 107, 53, 0.1);
+      color: #ff6b35;
+    }
+
+    .security-content h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .security-content p {
+      font-size: 0.9rem;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    /* ===================== */
+    /* ARCHITECTURE          */
+    /* ===================== */
+    .architecture {
+      background:
+        radial-gradient(ellipse 50% 40% at 50% 30%, rgba(118, 185, 0, 0.04) 0%, transparent 60%),
+        #0a0a0a;
+    }
+
+    .architecture .section-subtitle {
+      max-width: 600px;
+    }
+
+    .arch-diagram {
+      position: relative;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 20px 24px 28px;
+      margin: 0 auto 48px;
+      max-width: 620px;
+      overflow: hidden;
+    }
+
+    .arch-diagram::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(118, 185, 0, 0.3), transparent);
+    }
+
+    .arch-diagram .terminal-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .arch-diagram .terminal-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .arch-diagram .terminal-dots span:nth-child(1) { background: #ff5f57; }
+    .arch-diagram .terminal-dots span:nth-child(2) { background: #ffbd2e; }
+    .arch-diagram .terminal-dots span:nth-child(3) { background: #28ca41; }
+
+    .arch-diagram pre {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #999;
+      overflow-x: auto;
+    }
+
+    .arch-diagram pre .arch-highlight {
+      color: #76b900;
+      font-weight: 500;
+    }
+
+    .arch-diagram pre .arch-accent {
+      color: #ff6b35;
+    }
+
+    .arch-diagram pre .arch-dim {
+      color: #555;
+    }
+
+    .stat-boxes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .stat-box {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #1a1a1a;
+      border-radius: 12px;
+      padding: 24px 16px;
+      transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+      border-color: rgba(118, 185, 0, 0.2);
+      background: rgba(118, 185, 0, 0.03);
+      transform: translateY(-2px);
+    }
+
+    .stat-box .stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #76b900;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .stat-box:nth-child(even) .stat-value {
+      color: #ff6b35;
+    }
+
+    .stat-box .stat-label {
+      font-size: 0.78rem;
+      color: #666;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* ===================== */
     /* HARDWARE TABLE        */
     /* ===================== */
     .hardware {
@@ -486,6 +665,164 @@
     }
 
     /* ===================== */
+    /* TOOLS INSTALLED       */
+    /* ===================== */
+    .tools-section {
+      background:
+        radial-gradient(ellipse 50% 35% at 30% 40%, rgba(118, 185, 0, 0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 80% 70%, rgba(255, 107, 53, 0.03) 0%, transparent 60%),
+        #0a0a0a;
+    }
+
+    .tools-groups {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .tools-group {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #1a1a1a;
+      border-radius: 16px;
+      padding: 32px 28px;
+      transition: all 0.3s ease;
+    }
+
+    .tools-group:hover {
+      border-color: rgba(118, 185, 0, 0.15);
+      background: rgba(118, 185, 0, 0.02);
+    }
+
+    .tools-group-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .tools-group-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .tools-group-icon.green {
+      background: rgba(118, 185, 0, 0.1);
+      color: #76b900;
+    }
+
+    .tools-group-icon.orange {
+      background: rgba(255, 107, 53, 0.1);
+      color: #ff6b35;
+    }
+
+    .tools-group-icon.grey {
+      background: rgba(255, 255, 255, 0.06);
+      color: #999;
+    }
+
+    .tools-group-header h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .tools-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tools-list.scrollable {
+      max-height: 182px;
+      overflow-y: auto;
+      padding-right: 6px;
+      mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+    }
+
+    .tools-list.scrollable::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .tools-list.scrollable::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .tools-list.scrollable::-webkit-scrollbar-thumb {
+      background: rgba(118, 185, 0, 0.3);
+      border-radius: 4px;
+    }
+
+    .tools-list.scrollable::-webkit-scrollbar-thumb:hover {
+      background: rgba(118, 185, 0, 0.5);
+    }
+
+    .tools-scroll-hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 8px;
+      letter-spacing: 0.03em;
+    }
+
+    .tools-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: #999;
+      line-height: 1.5;
+    }
+
+    .tool-bullet {
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-top: 7px;
+    }
+
+    .tool-bullet.green {
+      background: #76b900;
+    }
+
+    .tool-bullet.orange {
+      background: #ff6b35;
+    }
+
+    .tool-bullet.grey {
+      background: #666;
+    }
+
+    .tools-list .tool-name {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .tools-list .tool-cmd {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: #76b900;
+      background: rgba(118, 185, 0, 0.08);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .tool-desc {
+      color: #666;
+      font-size: 0.82rem;
+    }
+
+    /* ===================== */
     /* INSTALL SECTION       */
     /* ===================== */
     .install-section {
@@ -558,6 +895,21 @@
         gap: 16px;
       }
 
+      .security-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .stat-boxes {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .tools-groups {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
       nav .nav-links {
         display: none;
       }
@@ -570,6 +922,10 @@
 
       .code-block code {
         font-size: 0.78rem;
+      }
+
+      .arch-diagram pre {
+        font-size: 0.7rem;
       }
 
       .timeline {
@@ -596,6 +952,20 @@
       .features-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+
+      .security-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .tools-groups {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .tools-groups .tools-group:last-child {
+        grid-column: 1 / -1;
+        max-width: 50%;
+        justify-self: center;
+      }
     }
   </style>
 </head>
@@ -607,6 +977,8 @@
       <div class="logo">clawspark</div>
       <ul class="nav-links">
         <li><a href="#features">Features</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#architecture">Architecture</a></li>
         <li><a href="#hardware">Hardware</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#install">Install</a></li>
@@ -628,7 +1000,7 @@
         <div class="terminal-dots">
           <span></span><span></span><span></span>
         </div>
-        <code><span class="prompt">$</span> curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash</code>
+        <code><span class="prompt">$</span> curl -fsSL https://clawspark.dev/install.sh | bash</code>
         <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
       </div>
     </div>
@@ -683,6 +1055,118 @@
           </div>
           <h3>Remote Access</h3>
           <p>Optional Tailscale integration. Access your AI from your phone in another country, securely over your Tailnet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security -->
+  <section class="security" id="security">
+    <div class="container">
+      <div class="fade-in">
+        <h2 class="section-title">Security</h2>
+        <p class="section-subtitle">Your AI runs on your hardware and stays locked down. Every layer is hardened by default.</p>
+      </div>
+      <div class="security-grid">
+        <div class="security-item fade-in">
+          <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Localhost Only</h3>
+            <p>Gateway binds to 127.0.0.1. Your AI is not accessible from the network.</p>
+          </div>
+        </div>
+        <div class="security-item fade-in">
+          <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Token Authentication</h3>
+            <p>Random 256-bit token generated at install. Every API call requires it.</p>
+          </div>
+        </div>
+        <div class="security-item fade-in">
+          <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Tool Restrictions</h3>
+            <p>Dangerous tools (exec, write, browser, process) blocked by default. Bot cannot run commands on your machine.</p>
+          </div>
+        </div>
+        <div class="security-item fade-in">
+          <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Hardened Agent</h3>
+            <p>SOUL.md and TOOLS.md are read-only. The AI cannot modify its own guardrails.</p>
+          </div>
+        </div>
+        <div class="security-item fade-in">
+          <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Firewall Rules</h3>
+            <p>UFW configured automatically. Deny incoming, allow outgoing, SSH only.</p>
+          </div>
+        </div>
+        <div class="security-item fade-in">
+          <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Air Gap Mode</h3>
+            <p>Optional complete network isolation via <code style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:#76b900;background:rgba(118,185,0,0.08);padding:1px 6px;border-radius:4px;">clawspark airgap on</code>. Zero outbound traffic.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section class="architecture" id="architecture">
+    <div class="container">
+      <div class="fade-in">
+        <h2 class="section-title">Architecture</h2>
+        <p class="section-subtitle">A clean stack from messaging layer to GPU. Everything runs locally on a single machine.</p>
+      </div>
+      <div class="arch-diagram fade-in">
+        <div class="terminal-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <pre>
+  <span class="arch-accent">WhatsApp</span> <span class="arch-dim">/</span> <span class="arch-accent">Telegram</span> <span class="arch-dim">/</span> <span class="arch-accent">Web UI</span>
+           <span class="arch-dim">|</span>
+  <span class="arch-highlight">OpenClaw Gateway</span>  <span class="arch-dim">(port 18789)</span>
+    <span class="arch-dim">|              |            |</span>
+  <span class="arch-highlight">Agent</span>          <span class="arch-highlight">Node Host</span>    <span class="arch-highlight">Baileys</span>
+  <span class="arch-dim">(LLM)</span>         <span class="arch-dim">(Tools)</span>      <span class="arch-dim">(WhatsApp)</span>
+    <span class="arch-dim">|              |</span>
+  <span class="arch-highlight">Ollama</span>       <span class="arch-dim">read, web_fetch,</span>
+  <span class="arch-dim">(port 11434)</span>  <span class="arch-dim">message</span>
+    <span class="arch-dim">|</span>
+  <span class="arch-accent">Qwen 3.5 35B</span>
+  <span class="arch-dim">(GB10 GPU)</span></pre>
+      </div>
+      <div class="stat-boxes">
+        <div class="stat-box fade-in">
+          <div class="stat-value">128 GB</div>
+          <div class="stat-label">Unified Memory</div>
+        </div>
+        <div class="stat-box fade-in">
+          <div class="stat-value">~59 tok/s</div>
+          <div class="stat-label">Generation Speed</div>
+        </div>
+        <div class="stat-box fade-in">
+          <div class="stat-value">1 PFLOP</div>
+          <div class="stat-label">AI Compute</div>
+        </div>
+        <div class="stat-box fade-in">
+          <div class="stat-value">15 Tools</div>
+          <div class="stat-label">Agent Capabilities</div>
         </div>
       </div>
     </div>
@@ -790,6 +1274,141 @@
     </div>
   </section>
 
+  <!-- Tools Installed -->
+  <section class="tools-section" id="tools">
+    <div class="container">
+      <div class="fade-in">
+        <h2 class="section-title">Tools Installed</h2>
+        <p class="section-subtitle">Skills, tools, and CLI commands that ship with every clawspark installation.</p>
+      </div>
+      <div class="tools-groups">
+        <div class="tools-group fade-in">
+          <div class="tools-group-header">
+            <div class="tools-group-icon green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <h3>Agent Skills</h3>
+          </div>
+          <ul class="tools-list">
+            <li>
+              <span class="tool-bullet green"></span>
+              <span><span class="tool-name">Web Search</span> <span class="tool-desc">-- DuckDuckGo, no API key needed</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet green"></span>
+              <span><span class="tool-name">Deep Research</span> <span class="tool-desc">-- Multi-source synthesis</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet green"></span>
+              <span><span class="tool-name">Voice Transcription</span> <span class="tool-desc">-- Local Whisper on GPU</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet green"></span>
+              <span><span class="tool-name">Prompt Guard</span> <span class="tool-desc">-- Injection defense</span></span>
+            </li>
+          </ul>
+        </div>
+        <div class="tools-group fade-in">
+          <div class="tools-group-header">
+            <div class="tools-group-icon orange">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <h3>Agent Tools <span style="font-size:0.7em;color:#888;font-weight:400">(15 tools, work out of the box)</span></h3>
+          </div>
+          <ul class="tools-list scrollable">
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">exec</span> <span class="tool-desc">-- Shell commands (bash, docker, kubectl)</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">web_fetch</span> <span class="tool-desc">-- HTTP requests, API calls, web search via DDG</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">read</span> <span class="tool-desc">-- Read files on the host</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">write</span> <span class="tool-desc">-- Write and create files</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">edit</span> <span class="tool-desc">-- Edit files in place</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">message</span> <span class="tool-desc">-- WhatsApp / Telegram replies</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">canvas</span> <span class="tool-desc">-- Interactive web UI</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">process</span> <span class="tool-desc">-- List, monitor, kill processes</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">cron</span> <span class="tool-desc">-- Scheduled tasks</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">sessions_spawn</span> <span class="tool-desc">-- Sub-agent sessions for parallel work</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">nodes</span> <span class="tool-desc">-- Remote node execution (paired devices)</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">memory_search</span> <span class="tool-desc">-- Search stored context</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">memory_store</span> <span class="tool-desc">-- Save info across sessions</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">transcribe</span> <span class="tool-desc">-- Audio/voice transcription (local Whisper)</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">vision</span> <span class="tool-desc">-- Image analysis (model-dependent)</span></span>
+            </li>
+          </ul>
+          <div class="tools-scroll-hint">Scroll for all 15 tools</div>
+        </div>
+        <div class="tools-group fade-in">
+          <div class="tools-group-header">
+            <div class="tools-group-icon grey">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            </div>
+            <h3>Management CLI</h3>
+          </div>
+          <ul class="tools-list">
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark status</span> <span class="tool-desc">-- Check all components</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark restart</span> <span class="tool-desc">-- Restart services</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark update</span> <span class="tool-desc">-- Update OpenClaw + re-apply patches</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark logs</span> <span class="tool-desc">-- View logs</span></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- The Install -->
   <section class="install-section" id="install">
     <div class="container">
@@ -801,7 +1420,7 @@
         <div class="terminal-dots">
           <span></span><span></span><span></span>
         </div>
-        <code><span class="prompt">$</span> curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash</code>
+        <code><span class="prompt">$</span> curl -fsSL https://clawspark.dev/install.sh | bash</code>
         <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
       </div>
       <p class="fade-in" style="color:#555;font-size:0.85rem;text-align:center;">Requires an NVIDIA GPU with CUDA drivers installed. Works on Ubuntu 22.04+ and JetPack 6+.</p>
@@ -814,6 +1433,8 @@
       <div class="footer-links">
         <a href="https://github.com/saiyam1814/claw-spark" target="_blank" rel="noopener">GitHub</a>
         <a href="#features">Features</a>
+        <a href="#security">Security</a>
+        <a href="#architecture">Architecture</a>
         <a href="#hardware">Hardware</a>
         <a href="#how-it-works">How It Works</a>
       </div>
@@ -827,7 +1448,7 @@
   <script>
     // Copy command to clipboard
     function copyCommand(btn) {
-      var command = 'curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash';
+      var command = 'curl -fsSL https://clawspark.dev/install.sh | bash';
       navigator.clipboard.writeText(command).then(function() {
         btn.textContent = 'Copied!';
         btn.classList.add('copied');

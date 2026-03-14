@@ -3,7 +3,7 @@
 # Sets up OpenClaw with a local LLM on NVIDIA DGX Spark, Jetson, or RTX hardware.
 #
 # Quick start:
-#   curl -fsSL https://raw.githubusercontent.com/saiyam1814/claw-spark/main/install.sh | bash
+#   curl -fsSL https://clawspark.dev/install.sh | bash
 #
 # Or clone and run:
 #   git clone https://github.com/saiyam1814/claw-spark && cd claw-spark && bash install.sh
