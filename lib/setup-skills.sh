@@ -92,7 +92,7 @@ setup_skills() {
 
     for skill in "${skills[@]}"; do
         printf '  %s→%s Installing %s%s%s ... ' "${CYAN}" "${RESET}" "${BOLD}" "${skill}" "${RESET}"
-        if timeout "${skill_timeout}" npx --yes clawhub@latest install "${skill}" >> "${CLAWSPARK_LOG}" 2>&1; then
+        if timeout "${skill_timeout}" npx --yes clawhub@latest install --force "${skill}" >> "${CLAWSPARK_LOG}" 2>&1; then
             printf '%s✓%s\n' "${GREEN}" "${RESET}"
             installed=$(( installed + 1 ))
         else
@@ -124,7 +124,7 @@ _install_community_skills() {
     )
     for skill in "${community_skills[@]}"; do
         printf '  %s->%s Installing %s%s%s ... ' "${CYAN}" "${RESET}" "${BOLD}" "${skill}" "${RESET}"
-        if timeout 120 npx --yes clawhub@latest install "${skill}" >> "${CLAWSPARK_LOG}" 2>&1; then
+        if timeout 120 npx --yes clawhub@latest install --force "${skill}" >> "${CLAWSPARK_LOG}" 2>&1; then
             printf '%sOK%s\n' "${GREEN}" "${RESET}"
         else
             printf '%sskipped%s\n' "${YELLOW}" "${RESET}"

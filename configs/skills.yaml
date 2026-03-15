@@ -6,8 +6,6 @@ skills:
     # Core
     - name: local-whisper
       description: Offline voice transcription via Whisper
-    - name: prompt-guard
-      description: Prompt injection defense system
     - name: self-improvement
       description: Agent learns from your corrections
     - name: memory-setup
@@ -18,22 +16,22 @@ skills:
       description: Voice notes to conversational flow
 
     # Productivity
-    - name: remind-me
-      description: Natural language reminders
-    - name: deep-research
-      description: Multi step research with planning
+    - name: deep-research-pro
+      description: Multi-step research with planning
     - name: agent-browser
       description: Web automation and browsing
-    - name: coding-agent
-      description: Run coding tasks in background
-    - name: excel
-      description: Read and write Excel files
 
     # Knowledge
     - name: second-brain
       description: Personal knowledge base
     - name: proactive-agent
       description: Proactive assistance and suggestions
+
+    # Web Search
+    - name: ddg-web-search
+      description: DuckDuckGo search (no API key needed)
+    - name: local-web-search-skill
+      description: Local web search fallback
 
   # Add your own skills below
   custom: []

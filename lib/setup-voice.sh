@@ -30,25 +30,35 @@ setup_voice() {
 
     log_info "Whisper model size: ${whisper_model} (for ${HW_PLATFORM})"
 
-    # ── Install local-whisper skill ─────────────────────────────────────────
-    printf '  %s→%s Installing local-whisper skill ... ' "${CYAN}" "${RESET}"
-    if npx clawhub@latest install local-whisper >> "${CLAWSPARK_LOG}" 2>&1; then
-        printf '%s✓%s\n' "${GREEN}" "${RESET}"
+    # ── Install local-whisper skill (skip if already installed by skills step)
+    local whisper_skill_dir="${HOME}/.openclaw/workspace/skills/local-whisper"
+    if [[ -d "${whisper_skill_dir}" ]]; then
+        log_info "local-whisper already installed (from skills step)."
     else
-        printf '%s✗%s\n' "${RED}" "${RESET}"
-        log_warn "local-whisper installation failed — voice features may not work."
+        printf '  %s→%s Installing local-whisper skill ... ' "${CYAN}" "${RESET}"
+        if npx --yes clawhub@latest install --force local-whisper >> "${CLAWSPARK_LOG}" 2>&1; then
+            printf '%s✓%s\n' "${GREEN}" "${RESET}"
+        else
+            printf '%s✗%s\n' "${RED}" "${RESET}"
+            log_warn "local-whisper installation failed — voice features may not work."
+        fi
     fi
 
     # ── Install WhatsApp voice integration if applicable ────────────────────
     local messaging="${FLAG_MESSAGING:-${MESSAGING_CHOICE:-skip}}"
     messaging="${messaging,,}"  # lowercase
     if [[ "${messaging}" == "whatsapp" || "${messaging}" == "both" ]]; then
-        printf '  %s→%s Installing whatsapp-voice-chat-integration ... ' "${CYAN}" "${RESET}"
-        if npx clawhub@latest install whatsapp-voice-chat-integration >> "${CLAWSPARK_LOG}" 2>&1; then
-            printf '%s✓%s\n' "${GREEN}" "${RESET}"
+        local voice_skill_dir="${HOME}/.openclaw/workspace/skills/whatsapp-voice-chat-integration-open-source"
+        if [[ -d "${voice_skill_dir}" ]]; then
+            log_info "whatsapp-voice-chat-integration already installed (from skills step)."
         else
-            printf '%s✗%s\n' "${RED}" "${RESET}"
-            log_warn "whatsapp-voice-chat-integration failed — voice notes may not work."
+            printf '  %s→%s Installing whatsapp-voice-chat-integration-open-source ... ' "${CYAN}" "${RESET}"
+            if npx --yes clawhub@latest install --force whatsapp-voice-chat-integration-open-source >> "${CLAWSPARK_LOG}" 2>&1; then
+                printf '%s✓%s\n' "${GREEN}" "${RESET}"
+            else
+                printf '%s✗%s\n' "${RED}" "${RESET}"
+                log_warn "whatsapp-voice-chat-integration failed — voice notes may not work."
+            fi
         fi
     fi
 
