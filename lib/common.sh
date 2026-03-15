@@ -79,19 +79,20 @@ prompt_choice() {
         return 0
     fi
 
-    printf '\n%s%s%s\n' "${BOLD}" "${question}" "${RESET}"
+    # Print menu to /dev/tty so it's visible even inside $(...) capture
+    printf '\n%s%s%s\n' "${BOLD}" "${question}" "${RESET}" >/dev/tty
     local i
     for i in $(seq 0 $(( count - 1 ))); do
         local marker=""
         if [[ "$i" -eq "$default_idx" ]]; then
             marker=" ${CYAN}(default)${RESET}"
         fi
-        printf '  %s%d)%s %s%s\n' "${GREEN}" $(( i + 1 )) "${RESET}" "${_options[$i]}" "${marker}"
+        printf '  %s%d)%s %s%s\n' "${GREEN}" $(( i + 1 )) "${RESET}" "${_options[$i]}" "${marker}" >/dev/tty
     done
 
     local selection
     while true; do
-        printf '%s> %s' "${BOLD}" "${RESET}"
+        printf '%s> %s' "${BOLD}" "${RESET}" >/dev/tty
         read -r selection </dev/tty || selection=""
         # Empty input → default
         if [[ -z "${selection}" ]]; then
@@ -103,7 +104,7 @@ prompt_choice() {
             printf '%s' "${_options[$(( selection - 1 ))]}"
             return 0
         fi
-        printf '  %sPlease enter a number between 1 and %d%s\n' "${YELLOW}" "${count}" "${RESET}"
+        printf '  %sPlease enter a number between 1 and %d%s\n' "${YELLOW}" "${count}" "${RESET}" >/dev/tty
     done
 }
 
@@ -120,7 +121,7 @@ prompt_yn() {
     local hint
     if [[ "${default}" == "y" ]]; then hint="[Y/n]"; else hint="[y/N]"; fi
 
-    printf '\n%s%s %s%s ' "${BOLD}" "${question}" "${hint}" "${RESET}"
+    printf '\n%s%s %s%s ' "${BOLD}" "${question}" "${hint}" "${RESET}" >/dev/tty
     local answer
     read -r answer </dev/tty || answer=""
     answer="${answer,,}"  # lowercase
