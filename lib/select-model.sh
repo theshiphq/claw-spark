@@ -44,12 +44,29 @@ select_model() {
 
 # ── DGX Spark: curated list (tested on real hardware) ─────────────────────
 _select_model_curated_spark() {
-    local -a model_ids=("qwen3.5:35b-a3b" "qwen3.5:122b" "glm-4.7-flash")
-    local -a model_names=("Qwen 3.5 35B-A3B" "Qwen 3.5 122B" "GLM 4.7 Flash")
+    # Top models for DGX Spark (128 GB unified memory, NVIDIA GB10).
+    # Ranked by llmfit score + verified on real hardware.
+    # tok/s estimates from llmfit; qwen3.5:35b-a3b measured at ~59 tok/s.
+    local -a model_ids=(
+        "qwen3.5:35b-a3b"
+        "qwen3.5:122b-a10b"
+        "qwen3-coder-next"
+        "qwen3-next"
+        "qwen3-coder:30b"
+    )
+    local -a model_names=(
+        "Qwen 3.5 35B-A3B"
+        "Qwen 3.5 122B-A10B"
+        "Qwen3 Coder Next 80B"
+        "Qwen3 Next 80B-A3B"
+        "Qwen3 Coder 30B-A3B"
+    )
     local -a model_labels=(
-        "Balanced (default) -- MoE, ~59 tok/s"
-        "Maximum quality -- 122B model (81GB)"
-        "Lightweight -- compact & fast"
+        "(default) General MoE 18GB -- ~59 tok/s, proven on Spark"
+        "Best quality MoE 33GB -- ~45 tok/s, llmfit #1 (Score 95.5)"
+        "Coding/agentic MoE 52GB -- ~109 tok/s est. (Score 93.6)"
+        "Chat/instruct MoE 50GB -- ~59 tok/s est. (Score 92.2)"
+        "Coding MoE lightweight 19GB -- ~58 tok/s est. (Score 94.1)"
         "Let me pick my own model"
     )
     local default_idx=0
@@ -236,11 +253,22 @@ import json, sys, re
 # Each entry: (compiled_regex, ollama_template)
 # Templates use {size} for parameter count extracted from the name/param field.
 PATTERNS = [
-    # Qwen family
+    # Qwen3 Coder Next (must be before generic Qwen3 patterns)
+    (r'(?i)qwen3-coder-next|qwen3.*coder.*next',  'qwen3-coder-next'),
+    # Qwen3 Coder (30B-A3B is the main variant on Ollama)
+    (r'(?i)qwen3.*coder.*30b',        'qwen3-coder:30b'),
+    (r'(?i)qwen3.*coder.*480b',       'qwen3-coder:480b'),
+    (r'(?i)qwen3.*coder',             'qwen3-coder:30b'),
+    # Qwen3 Next (80B-A3B is the main variant on Ollama)
+    (r'(?i)qwen3-next|qwen3.*next.*80b', 'qwen3-next'),
+    # Qwen3.5 family (specific MoE variants first)
     (r'(?i)qwen.*3\.5.*35b.*a3b',     'qwen3.5:35b-a3b'),
+    (r'(?i)qwen.*3\.5.*122b.*a10b',   'qwen3.5:122b-a10b'),
     (r'(?i)qwen.*3\.5.*122b',         'qwen3.5:122b'),
     (r'(?i)qwen.*3\.5.*(\d+)b',       'qwen3.5:{size}b'),
+    # Generic Qwen3 (non-coder, non-next)
     (r'(?i)qwen.*?3[^.].*?(\d+)b',    'qwen3:{size}b'),
+    # Qwen 2.x
     (r'(?i)qwen.*2\.5.*(\d+)b',       'qwen2.5:{size}b'),
     (r'(?i)qwen.*2.*(\d+)b',          'qwen2:{size}b'),
     # Llama family
