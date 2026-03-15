@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/setup-dashboard.sh — Installs ClawMetry observability dashboard for OpenClaw.
+# lib/setup-dashboard.sh -- Installs ClawMetry observability dashboard for OpenClaw.
 # Provides metrics, logs, and health monitoring via a local web UI.
 set -euo pipefail
 
@@ -9,34 +9,24 @@ setup_dashboard() {
 
     # ── Check dependencies ───────────────────────────────────────────────────
     if ! check_command python3; then
-        log_error "python3 is required for ClawMetry but was not found."
-        log_info "Install Python 3 and re-run this step."
-        return 1
-    fi
-
-    if ! check_command pip3 && ! python3 -m pip --version &>/dev/null; then
-        log_error "pip3 is required for ClawMetry but was not found."
-        log_info "Install pip (e.g. 'sudo apt-get install python3-pip') and re-run."
-        return 1
+        log_warn "python3 not found -- skipping dashboard."
+        return 0
     fi
 
     # ── Install ClawMetry ────────────────────────────────────────────────────
     local install_ok=false
 
     log_info "Installing ClawMetry via pip..."
-    if (pip3 install clawmetry) >> "${CLAWSPARK_LOG}" 2>&1; then
+    if _pip_install clawmetry; then
         install_ok=true
         log_success "ClawMetry installed via pip."
-    elif (pip3 install --user clawmetry) >> "${CLAWSPARK_LOG}" 2>&1; then
-        install_ok=true
-        log_success "ClawMetry installed via pip (--user)."
     else
-        log_warn "pip3 install clawmetry failed — falling back to git clone."
+        log_warn "pip install clawmetry failed -- falling back to git clone."
 
-        # ── Fallback: clone from GitHub ──────────────────────────────────
+        # ── Fallback: clone from GitHub ──────────────────────────────
         local clone_dir="${CLAWSPARK_DIR}/clawmetry"
         if [[ -d "${clone_dir}" ]]; then
-            log_info "Existing clone found at ${clone_dir} — pulling latest..."
+            log_info "Existing clone found at ${clone_dir} -- pulling latest..."
             (cd "${clone_dir}" && git pull) >> "${CLAWSPARK_LOG}" 2>&1 || true
         else
             log_info "Cloning ClawMetry from GitHub..."
@@ -47,19 +37,21 @@ setup_dashboard() {
 
         if [[ -d "${clone_dir}" ]]; then
             log_info "Installing Flask dependency..."
-            (pip3 install flask || pip3 install --user flask) >> "${CLAWSPARK_LOG}" 2>&1 &
-            spinner $! "Installing Flask..."
-            install_ok=true
-            log_success "ClawMetry installed from source."
+            if _pip_install flask; then
+                install_ok=true
+                log_success "ClawMetry installed from source."
+            else
+                log_warn "Flask install failed -- dashboard may not work."
+            fi
         else
-            log_error "Failed to clone ClawMetry. Check ${CLAWSPARK_LOG}."
-            return 1
+            log_warn "Failed to clone ClawMetry -- skipping dashboard."
+            return 0
         fi
     fi
 
     if [[ "${install_ok}" != "true" ]]; then
-        log_error "ClawMetry installation failed."
-        return 1
+        log_warn "ClawMetry installation incomplete -- skipping dashboard."
+        return 0
     fi
 
     # ── Configure ClawMetry workspace ────────────────────────────────────────
@@ -95,7 +87,7 @@ CMEOF
     if [[ "${dashboard_up}" == "true" ]]; then
         log_success "ClawMetry dashboard is running at http://127.0.0.1:8900"
     else
-        log_warn "ClawMetry dashboard did not respond — it may still be starting."
+        log_warn "ClawMetry dashboard did not respond -- it may still be starting."
         log_info "Check logs at ${CLAWSPARK_DIR}/dashboard.log"
     fi
 
@@ -115,6 +107,28 @@ CMEOF
 }
 
 # ── Internal helpers ─────────────────────────────────────────────────────────
+
+# pip install that handles PEP 668 (externally managed Python on Ubuntu 23.04+)
+_pip_install() {
+    local pkg="$1"
+    # Try normal pip first
+    if pip3 install "${pkg}" >> "${CLAWSPARK_LOG}" 2>&1; then
+        return 0
+    fi
+    # Try --user
+    if pip3 install --user "${pkg}" >> "${CLAWSPARK_LOG}" 2>&1; then
+        return 0
+    fi
+    # Try --break-system-packages (PEP 668 workaround for managed Python)
+    if pip3 install --break-system-packages "${pkg}" >> "${CLAWSPARK_LOG}" 2>&1; then
+        return 0
+    fi
+    # Try python3 -m pip as last resort
+    if python3 -m pip install --break-system-packages "${pkg}" >> "${CLAWSPARK_LOG}" 2>&1; then
+        return 0
+    fi
+    return 1
+}
 
 _start_dashboard() {
     local dashboard_log="${CLAWSPARK_DIR}/dashboard.log"

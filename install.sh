@@ -239,7 +239,7 @@ setup_tailscale
 
 # ── Step 12: Dashboard ─────────────────────────────────────────────────────
 log_info "Step 12/14: Setting up dashboard"
-setup_dashboard
+setup_dashboard || log_warn "Dashboard setup had issues -- continuing with install."
 
 # ── Step 13: Security ──────────────────────────────────────────────────────
 log_info "Step 13/14: Applying security"
