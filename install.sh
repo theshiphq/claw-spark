@@ -9,8 +9,27 @@
 #   git clone https://github.com/saiyam1814/claw-spark && cd claw-spark && bash install.sh
 set -euo pipefail
 
-# ── Resolve script directory (works even when piped from curl) ──────────────
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" 2>/dev/null)" &>/dev/null && pwd 2>/dev/null || echo "/tmp/clawspark")"
+# ── Bootstrap: if piped from curl, clone the repo and re-exec ─────────────
+SCRIPT_DIR=""
+if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd 2>/dev/null || true)"
+fi
+
+if [[ -z "${SCRIPT_DIR}" ]] || [[ ! -d "${SCRIPT_DIR}/lib" ]]; then
+    # Running via curl pipe -- no lib/ available, need to clone
+    CLONE_DIR="$(mktemp -d)/claw-spark"
+    echo "Downloading clawspark..."
+    if command -v git &>/dev/null; then
+        git clone --depth 1 https://github.com/saiyam1814/claw-spark.git "${CLONE_DIR}" 2>/dev/null
+    else
+        # Fallback: download tarball if git is not available
+        mkdir -p "${CLONE_DIR}"
+        curl -fsSL https://github.com/saiyam1814/claw-spark/archive/refs/heads/main.tar.gz \
+            | tar xz --strip-components=1 -C "${CLONE_DIR}"
+    fi
+    # Re-exec from the cloned repo, passing through all args
+    exec bash "${CLONE_DIR}/install.sh" "$@"
+fi
 
 # ── Parse command-line flags ────────────────────────────────────────────────
 CLAWSPARK_DEFAULTS="${CLAWSPARK_DEFAULTS:-false}"
@@ -63,13 +82,9 @@ CLAWSPARK_LOG="${CLAWSPARK_DIR}/install.log"
 _source_lib() {
     local lib_dir="${SCRIPT_DIR}/lib"
 
-    # If running from curl pipe and lib/ doesn't exist, try to download
     if [[ ! -d "${lib_dir}" ]]; then
-        lib_dir="${CLAWSPARK_DIR}/lib"
-        if [[ ! -d "${lib_dir}" ]]; then
-            echo "ERROR: Cannot find lib/ directory. Please clone the repo and run install.sh from there." >&2
-            exit 1
-        fi
+        echo "ERROR: Cannot find lib/ directory at ${lib_dir}" >&2
+        exit 1
     fi
 
     local f
