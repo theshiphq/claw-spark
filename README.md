@@ -35,15 +35,26 @@ Total time: about 5 minutes on DGX Spark with a decent connection.
 
 ## Supported Hardware
 
+**Tested and verified:**
+
 | Hardware | Memory | Default Model | Tokens/sec |
 |---|---|---|---|
 | DGX Spark | 128 GB unified | Qwen 3.5 35B-A3B | ~59 (measured) |
-| Jetson AGX Thor | 128 GB unified | llmfit-selected | varies |
-| Jetson AGX Orin | 64 GB unified | llmfit-selected | varies |
-| RTX 5090 / 4090 | 24 GB VRAM | llmfit-selected | varies |
-| RTX 4080 / 4070 | 8-16 GB VRAM | llmfit-selected | varies |
 
-DGX Spark models are curated and tested on real hardware. All other platforms use llmfit for automatic hardware-aware model selection with Ollama verification.
+DGX Spark has a curated model list tested on real hardware.
+
+**Should work (community testing welcome):**
+
+| Hardware | Memory | How to run |
+|---|---|---|
+| Jetson AGX Thor | 128 GB unified | SSH into Jetson, run the install command |
+| Jetson AGX Orin | 64 GB unified | SSH into Jetson, run the install command |
+| RTX 5090 / 4090 | 24 GB VRAM | Open a terminal on your desktop, run the install command |
+| RTX 4080 / 4070 | 8-16 GB VRAM | Open a terminal on your desktop, run the install command |
+
+These platforms use [llmfit](https://github.com/AlexsJones/llmfit) to detect your hardware and recommend the best model that fits your VRAM/RAM, then verify it exists on Ollama before offering it. Requirements: Linux with NVIDIA drivers and CUDA installed, `nvidia-smi` working.
+
+**Not yet supported:** macOS (Apple Silicon), AMD GPUs, Intel Arc. PRs welcome.
 
 ## The 3 Questions
 
