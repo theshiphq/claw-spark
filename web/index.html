@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>clawspark - One Command. Private AI Assistant. Your Hardware.</title>
-  <meta name="description" content="One-click installer for OpenClaw on NVIDIA hardware. Turn your DGX Spark, Jetson, or RTX GPU into a private AI assistant you control via WhatsApp and Telegram.">
+  <meta name="description" content="One-click installer for OpenClaw on your own hardware. Turn your DGX Spark, RTX GPU, Mac, or Jetson into a private AI assistant you control via WhatsApp and Telegram.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -994,7 +994,7 @@
       <h1><span class="accent">claw</span>spark</h1>
       <p class="tagline">One command. Private AI assistant. Your hardware.</p>
       <p class="description">
-        The one-click installer for OpenClaw on NVIDIA hardware. Turn your DGX Spark, Jetson, or RTX GPU into a private AI assistant you control via WhatsApp and Telegram, with local voice transcription and full privacy.
+        The one-click installer for OpenClaw on your own hardware. Turn your DGX Spark, RTX GPU, Mac, or Jetson into a private AI assistant you control via WhatsApp and Telegram, with local voice transcription and full privacy.
       </p>
       <div class="code-block">
         <div class="terminal-dots">
@@ -1019,7 +1019,7 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
           </div>
           <h3>Hardware Detection</h3>
-          <p>Auto-detects your NVIDIA hardware: DGX Spark, Jetson, or RTX GPUs. No manual configuration needed.</p>
+          <p>Auto-detects your hardware: DGX Spark, RTX GPUs, Mac (Apple Silicon), or Jetson. No manual configuration needed.</p>
         </div>
         <div class="feature-card fade-in">
           <div class="feature-icon">
@@ -1177,45 +1177,52 @@
     <div class="container">
       <div class="fade-in">
         <h2 class="section-title">Supported Hardware</h2>
-        <p class="section-subtitle">clawspark automatically detects your GPU and selects the best configuration.</p>
+        <p class="section-subtitle">clawspark automatically detects your hardware and selects the best model configuration.</p>
       </div>
       <div class="table-wrapper fade-in">
         <table>
           <thead>
             <tr>
               <th>Hardware</th>
-              <th>VRAM</th>
-              <th>Recommended Model</th>
-              <th>Performance</th>
+              <th>Memory</th>
+              <th>Default Model</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="hw-name">NVIDIA DGX Spark</td>
-              <td class="hw-vram">128 GB</td>
-              <td>Qwen 3.5 35B-A3B (MoE) / Qwen 3.5 122B</td>
-              <td class="hw-perf perf-excellent">~59 tok/s</td>
+              <td class="hw-vram">128 GB unified</td>
+              <td>Qwen 3.5 35B-A3B</td>
+              <td class="hw-perf perf-excellent">~59 tok/s (tested)</td>
             </tr>
             <tr>
-              <td class="hw-name">Jetson AGX Orin</td>
-              <td class="hw-vram">64 GB</td>
-              <td>Nemotron 3 Nano 30B</td>
-              <td class="hw-perf perf-great">~25 tok/s</td>
+              <td class="hw-name">Mac M1 / M2 / M3 / M4</td>
+              <td class="hw-vram">16-128 GB unified</td>
+              <td>llmfit-selected</td>
+              <td class="hw-perf perf-great">untested</td>
             </tr>
             <tr>
-              <td class="hw-name">RTX 5090</td>
-              <td class="hw-vram">32 GB</td>
-              <td>Qwen 3.5 35B-A3B (Q4)</td>
-              <td class="hw-perf perf-great">~40 tok/s</td>
+              <td class="hw-name">RTX 5090 / 4090</td>
+              <td class="hw-vram">24-32 GB VRAM</td>
+              <td>llmfit-selected</td>
+              <td class="hw-perf perf-great">untested</td>
             </tr>
             <tr>
-              <td class="hw-name">RTX 4090</td>
-              <td class="hw-vram">24 GB</td>
-              <td>GLM 4.7 Flash</td>
-              <td class="hw-perf perf-good">~35 tok/s</td>
+              <td class="hw-name">RTX 4080 / 4070</td>
+              <td class="hw-vram">8-16 GB VRAM</td>
+              <td>llmfit-selected</td>
+              <td class="hw-perf perf-good">untested</td>
+            </tr>
+            <tr>
+              <td class="hw-name">Jetson AGX Orin / Thor</td>
+              <td class="hw-vram">64-128 GB unified</td>
+              <td>llmfit-selected</td>
+              <td class="hw-perf perf-great">untested</td>
             </tr>
           </tbody>
         </table>
+        <p style="color:#888;font-size:0.85rem;margin-top:12px;text-align:center;">DGX Spark is the only platform with full end-to-end testing. Other platforms should work -- community testing welcome.</p>
       </div>
     </div>
   </section>
@@ -1232,7 +1239,7 @@
           <div class="timeline-dot"></div>
           <span class="step-label">Step 1</span>
           <h4>Detect</h4>
-          <p>Scans your system for NVIDIA GPUs and identifies the exact hardware model and available VRAM.</p>
+          <p>Scans your system for GPUs and identifies the exact hardware model and available VRAM or unified memory.</p>
         </div>
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
@@ -1414,7 +1421,7 @@
     <div class="container">
       <div class="fade-in">
         <h2 class="section-title">Get Started</h2>
-        <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">One command is all it takes. Run it on any supported NVIDIA machine.</p>
+        <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">One command is all it takes. Run it on any supported machine.</p>
       </div>
       <div class="code-block fade-in" style="margin-bottom: 24px;">
         <div class="terminal-dots">
@@ -1423,7 +1430,7 @@
         <code><span class="prompt">$</span> curl -fsSL https://clawspark.dev/install.sh | bash</code>
         <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
       </div>
-      <p class="fade-in" style="color:#555;font-size:0.85rem;text-align:center;">Requires an NVIDIA GPU with CUDA drivers installed. Works on Ubuntu 22.04+ and JetPack 6+.</p>
+      <p class="fade-in" style="color:#555;font-size:0.85rem;text-align:center;">Works on DGX Spark, RTX GPUs (Linux + CUDA), Mac (Apple Silicon), and Jetson. Tested on DGX Spark.</p>
     </div>
   </section>
 
