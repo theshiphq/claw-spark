@@ -152,21 +152,37 @@ print(dns_name.rstrip('.'))
     # Save the URL for the final install message
     echo "${ts_url}" > "${CLAWSPARK_DIR}/tailscale.url"
 
+    # ── Build the tokenized remote URL ─────────────────────────────────────────
+    # Get the dashboard token so we can give the user a ready-to-use URL.
+    local dash_token=""
+    local dash_output
+    dash_output=$(openclaw dashboard --no-open 2>/dev/null || echo "")
+    if [[ -n "${dash_output}" ]]; then
+        dash_token=$(echo "${dash_output}" | grep -o 'token=[a-f0-9]*' | head -1 | cut -d= -f2 || echo "")
+    fi
+
+    local ts_chat_url="${ts_url}"
+    if [[ -n "${dash_token}" ]]; then
+        ts_chat_url="${ts_url}/#token=${dash_token}"
+    fi
+
     # ── Print access information ─────────────────────────────────────────────
     printf '\n'
     print_box \
         "${BOLD}Tailscale Remote Access${RESET}" \
         "" \
-        "OpenClaw gateway:" \
-        "  ${ts_url}" \
+        "Open this URL on any device on your Tailnet:" \
+        "  ${ts_chat_url}" \
         "" \
-        "To also expose the ClawMetry dashboard:" \
-        "  tailscale serve --bg --https 8900 http://127.0.0.1:8900" \
+        "First time connecting from a new browser:" \
+        "  1. Open the URL above" \
+        "  2. If you see 'pairing required', run on this machine:" \
+        "     openclaw devices list" \
+        "     openclaw devices approve <request-id>" \
         "" \
-        "Access from any device on your Tailnet." \
         "Traffic is encrypted end-to-end via WireGuard."
     printf '\n'
 
-    log_info "Access your AI assistant from any device on your Tailnet at ${ts_url}"
+    log_info "Remote URL: ${ts_chat_url}"
     log_success "Tailscale setup complete."
 }
