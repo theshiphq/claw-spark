@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>clawspark - One Command. Private AI Assistant. Your Hardware.</title>
-  <meta name="description" content="One-click installer for OpenClaw on your own hardware. Turn your DGX Spark, RTX GPU, Mac, or Jetson into a private AI assistant you control via WhatsApp and Telegram.">
+  <title>clawspark - One Command. Private AI Agent. Your Hardware.</title>
+  <meta name="description" content="One-click installer for a fully private AI agent on your own hardware. Code, research, browse the web, analyze images, and automate tasks on DGX Spark, RTX GPUs, Mac, or Jetson. No cloud. No API keys. No data leaves your machine.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -900,6 +900,10 @@
         gap: 16px;
       }
 
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
       .stat-boxes {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
@@ -992,9 +996,9 @@
     <div class="hero-content fade-in">
       <div class="hero-badge">Open Source / MIT License</div>
       <h1><span class="accent">claw</span>spark</h1>
-      <p class="tagline">One command. Private AI assistant. Your hardware.</p>
+      <p class="tagline">One command. Private AI agent. Your hardware.</p>
       <p class="description">
-        The one-click installer for OpenClaw on your own hardware. Turn your DGX Spark, RTX GPU, Mac, or Jetson into a private AI assistant you control via WhatsApp and Telegram, with local voice transcription and full privacy.
+        Turn your DGX Spark, RTX GPU, Mac, or Jetson into a private AI agent that can code, research, browse the web, analyze images, and run tasks. Everything runs locally. Your data never leaves your machine.
       </p>
       <div class="code-block">
         <div class="terminal-dots">
@@ -1010,51 +1014,72 @@
   <section class="features" id="features">
     <div class="container">
       <div class="fade-in">
-        <h2 class="section-title">What It Does</h2>
-        <p class="section-subtitle">Everything you need to go from bare hardware to a fully private AI assistant, handled automatically.</p>
+        <h2 class="section-title">What Your Agent Can Do</h2>
+        <p class="section-subtitle">Not just a chatbot. A full AI agent that writes code, browses the web, analyzes images, and runs tasks on your hardware.</p>
       </div>
       <div class="features-grid">
         <div class="feature-card fade-in">
           <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           </div>
-          <h3>Hardware Detection</h3>
-          <p>Auto-detects your hardware: DGX Spark, RTX GPUs, Mac (Apple Silicon), or Jetson. No manual configuration needed.</p>
+          <h3>Write and Run Code</h3>
+          <p>Ask it to build apps, scripts, or tools. It writes the code, tests it in a Docker sandbox, and iterates until it works.</p>
         </div>
         <div class="feature-card fade-in">
           <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
-          <h3>Best Model Selection</h3>
-          <p>Picks the optimal AI model for your specific hardware, maximizing performance without running out of memory.</p>
+          <h3>Deep Research</h3>
+          <p>Spawns parallel sub-agents that each research a subtopic, then merges everything into one report. Web search via DuckDuckGo, no API key needed.</p>
         </div>
         <div class="feature-card fade-in">
           <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           </div>
-          <h3>One-Click Install</h3>
-          <p>OpenClaw, inference engine, and all skills deployed in a single command. No Docker headaches, no dependency hell.</p>
+          <h3>Browser Automation</h3>
+          <p>Headless Chromium built in. Navigate websites, fill forms, click buttons, take screenshots. All running locally.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <h3>Vision and Image Analysis</h3>
+          <p>Send a screenshot, photo, or diagram. The vision model (qwen2.5-vl) analyzes it and describes what it sees. Multi-model support built in.</p>
         </div>
         <div class="feature-card fade-in">
           <div class="feature-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
           </div>
           <h3>Voice Enabled</h3>
-          <p>Send WhatsApp or Telegram voice notes. Whisper transcribes them locally on your GPU, keeping conversations private.</p>
+          <p>Send WhatsApp or Telegram voice notes. Whisper transcribes them locally on your GPU. No audio ever leaves your machine.</p>
         </div>
         <div class="feature-card fade-in">
           <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
           </div>
-          <h3>Dashboard + Metrics</h3>
-          <p>Built-in chat UI and ClawMetry metrics dashboard. Track tokens, costs, sessions, and agent activity in real time.</p>
+          <h3>Docker Sandbox</h3>
+          <p>Agent-generated code runs in isolated containers. No network, read-only root, all capabilities dropped, custom seccomp profile.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </div>
+          <h3>Sub-Agent Orchestration</h3>
+          <p>Spawns background agents for parallel work. Up to 4 concurrent sub-agents with 2 levels of depth. Complex tasks broken into threads.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3>Skill Packs</h3>
+          <p>Curated bundles for research, coding, productivity, and voice. Install a full skill pack with one command or pick individual skills.</p>
         </div>
         <div class="feature-card fade-in">
           <div class="feature-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
-          <h3>Remote Access</h3>
-          <p>Optional Tailscale integration. Access your AI from your phone in another country, securely over your Tailnet.</p>
+          <h3>Survives Reboots</h3>
+          <p>Systemd services auto-start everything on boot. Gateway, node host, dashboard, Ollama. No manual restarts, ever.</p>
         </div>
       </div>
     </div>
@@ -1115,6 +1140,15 @@
         </div>
         <div class="security-item fade-in">
           <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Docker Sandbox</h3>
+            <p>Code execution isolated in containers: no network, read-only root, all capabilities dropped, custom seccomp profile, 200 PID limit.</p>
+          </div>
+        </div>
+        <div class="security-item fade-in">
+          <div class="security-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <div class="security-content">
@@ -1138,17 +1172,18 @@
           <span></span><span></span><span></span>
         </div>
         <pre>
-  <span class="arch-accent">WhatsApp</span> <span class="arch-dim">/</span> <span class="arch-accent">Telegram</span> <span class="arch-dim">/</span> <span class="arch-accent">Web UI</span>
+  <span class="arch-accent">WhatsApp</span> <span class="arch-dim">/</span> <span class="arch-accent">Telegram</span> <span class="arch-dim">/</span> <span class="arch-accent">Web UI</span> <span class="arch-dim">/</span> <span class="arch-accent">Voice</span>
            <span class="arch-dim">|</span>
   <span class="arch-highlight">OpenClaw Gateway</span>  <span class="arch-dim">(port 18789)</span>
-    <span class="arch-dim">|              |            |</span>
-  <span class="arch-highlight">Agent</span>          <span class="arch-highlight">Node Host</span>    <span class="arch-highlight">Baileys</span>
-  <span class="arch-dim">(LLM)</span>         <span class="arch-dim">(Tools)</span>      <span class="arch-dim">(WhatsApp)</span>
+    <span class="arch-dim">|              |            |           |</span>
+  <span class="arch-highlight">Agent</span>          <span class="arch-highlight">Node Host</span>    <span class="arch-highlight">Baileys</span>      <span class="arch-highlight">Sub-Agents</span>
+  <span class="arch-dim">(LLM)</span>         <span class="arch-dim">(26 tools)</span>   <span class="arch-dim">(WhatsApp)</span>   <span class="arch-dim">(parallel)</span>
     <span class="arch-dim">|              |</span>
-  <span class="arch-highlight">Ollama</span>       <span class="arch-dim">read, web_fetch,</span>
-  <span class="arch-dim">(port 11434)</span>  <span class="arch-dim">message</span>
-    <span class="arch-dim">|</span>
-  <span class="arch-accent">Qwen 3.5 35B</span>
+  <span class="arch-highlight">Ollama</span>       <span class="arch-dim">exec, browser, read,</span>
+  <span class="arch-dim">(port 11434)</span>  <span class="arch-dim">write, web_search, vision</span>
+    <span class="arch-dim">|                   |</span>
+  <span class="arch-accent">Chat Model</span>     <span class="arch-highlight">Docker Sandbox</span>
+  <span class="arch-dim">+ Vision Model</span>  <span class="arch-dim">(isolated exec)</span>
   <span class="arch-dim">(GB10 GPU)</span></pre>
       </div>
       <div class="stat-boxes">
@@ -1165,7 +1200,7 @@
           <div class="stat-label">AI Compute</div>
         </div>
         <div class="stat-box fade-in">
-          <div class="stat-value">15 Tools</div>
+          <div class="stat-value">26+ Tools</div>
           <div class="stat-label">Agent Capabilities</div>
         </div>
       </div>
@@ -1232,50 +1267,50 @@
     <div class="container">
       <div class="fade-in">
         <h2 class="section-title">How It Works</h2>
-        <p class="section-subtitle">From bare hardware to a working private AI assistant in minutes.</p>
+        <p class="section-subtitle">From bare hardware to a fully capable AI agent in about 5 minutes.</p>
       </div>
       <div class="timeline">
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
           <span class="step-label">Step 1</span>
-          <h4>Detect</h4>
-          <p>Scans your system for GPUs and identifies the exact hardware model and available VRAM or unified memory.</p>
+          <h4>Detect Hardware</h4>
+          <p>Scans for GPUs, identifies your hardware model, and measures available VRAM or unified memory.</p>
         </div>
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
           <span class="step-label">Step 2</span>
-          <h4>Recommend</h4>
-          <p>Selects the best AI model, quantization level, and inference engine for your specific hardware.</p>
+          <h4>Pick the Best Model</h4>
+          <p>Uses llmfit to select the optimal chat model for your hardware. Pulls a vision model automatically for image analysis.</p>
         </div>
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
           <span class="step-label">Step 3</span>
-          <h4>Download</h4>
-          <p>Pulls the model weights and required containers. Progress bars keep you informed.</p>
+          <h4>Install Everything</h4>
+          <p>Ollama, OpenClaw, skills, Whisper for voice, Chromium for browser automation. All handled automatically.</p>
         </div>
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
           <span class="step-label">Step 4</span>
-          <h4>Install</h4>
-          <p>Deploys OpenClaw with the inference engine, Whisper for voice, and all configured skills.</p>
+          <h4>Set Up Sandbox</h4>
+          <p>Installs Docker if needed, builds an isolated container image with seccomp, no-network, and read-only rootfs for safe code execution.</p>
         </div>
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
           <span class="step-label">Step 5</span>
-          <h4>Secure</h4>
-          <p>Locks down the installation: localhost-only access, firewall rules, and optional air gap mode.</p>
+          <h4>Create Services</h4>
+          <p>Systemd services for gateway, node host, and dashboard. Everything auto-starts on boot and restarts on failure.</p>
         </div>
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
           <span class="step-label">Step 6</span>
-          <h4>Connect</h4>
-          <p>Guides you through linking WhatsApp or Telegram so you can start messaging your AI assistant.</p>
+          <h4>Harden Security</h4>
+          <p>Firewall rules, auth tokens, localhost binding, read-only guardrails. Your agent is locked down by default.</p>
         </div>
         <div class="timeline-step fade-in">
           <div class="timeline-dot"></div>
           <span class="step-label">Done</span>
-          <h4>Ready</h4>
-          <p>Your private AI assistant is live. Talk to it via voice or text, entirely on your own hardware.</p>
+          <h4>Agent Ready</h4>
+          <p>Your private AI agent is live. Code, research, browse, analyze images, run tasks. All on your hardware, all private.</p>
         </div>
       </div>
     </div>
@@ -1286,7 +1321,7 @@
     <div class="container">
       <div class="fade-in">
         <h2 class="section-title">Tools Installed</h2>
-        <p class="section-subtitle">Skills, tools, and CLI commands that ship with every clawspark installation.</p>
+        <p class="section-subtitle">26+ agent tools, 10 skills, and a full management CLI ship with every clawspark installation.</p>
       </div>
       <div class="tools-groups">
         <div class="tools-group fade-in">
@@ -1320,7 +1355,7 @@
             <div class="tools-group-icon orange">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
             </div>
-            <h3>Agent Tools <span style="font-size:0.7em;color:#888;font-weight:400">(15 tools, work out of the box)</span></h3>
+            <h3>Agent Tools <span style="font-size:0.7em;color:#888;font-weight:400">(26+ tools, work out of the box)</span></h3>
           </div>
           <ul class="tools-list scrollable">
             <li>
@@ -1361,10 +1396,6 @@
             </li>
             <li>
               <span class="tool-bullet orange"></span>
-              <span><span class="tool-cmd">sessions_spawn</span> <span class="tool-desc">-- Sub-agent sessions for parallel work</span></span>
-            </li>
-            <li>
-              <span class="tool-bullet orange"></span>
               <span><span class="tool-cmd">nodes</span> <span class="tool-desc">-- Remote node execution (paired devices)</span></span>
             </li>
             <li>
@@ -1381,10 +1412,30 @@
             </li>
             <li>
               <span class="tool-bullet orange"></span>
-              <span><span class="tool-cmd">vision</span> <span class="tool-desc">-- Image analysis (model-dependent)</span></span>
+              <span><span class="tool-cmd">vision</span> <span class="tool-desc">-- Image analysis (qwen2.5-vl)</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">browser</span> <span class="tool-desc">-- Navigate websites, click, fill forms, screenshot</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">web_search</span> <span class="tool-desc">-- DuckDuckGo search, no API key</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">image</span> <span class="tool-desc">-- Download and process images</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">pdf</span> <span class="tool-desc">-- Read and extract PDF content</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet orange"></span>
+              <span><span class="tool-cmd">sessions_spawn</span> <span class="tool-desc">-- Sub-agent sessions for parallel work</span></span>
             </li>
           </ul>
-          <div class="tools-scroll-hint">Scroll for all 15 tools</div>
+          <div class="tools-scroll-hint">Scroll for all tools</div>
         </div>
         <div class="tools-group fade-in">
           <div class="tools-group-header">
@@ -1393,10 +1444,18 @@
             </div>
             <h3>Management CLI</h3>
           </div>
-          <ul class="tools-list">
+          <ul class="tools-list scrollable">
             <li>
               <span class="tool-bullet grey"></span>
               <span><span class="tool-cmd">clawspark status</span> <span class="tool-desc">-- Check all components</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark start</span> <span class="tool-desc">-- Start all services</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark stop</span> <span class="tool-desc">-- Stop all services</span></span>
             </li>
             <li>
               <span class="tool-bullet grey"></span>
@@ -1404,7 +1463,19 @@
             </li>
             <li>
               <span class="tool-bullet grey"></span>
-              <span><span class="tool-cmd">clawspark update</span> <span class="tool-desc">-- Update OpenClaw + re-apply patches</span></span>
+              <span><span class="tool-cmd">clawspark model list</span> <span class="tool-desc">-- Show all models</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark model switch</span> <span class="tool-desc">-- Change chat model</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark sandbox on</span> <span class="tool-desc">-- Enable Docker sandbox</span></span>
+            </li>
+            <li>
+              <span class="tool-bullet grey"></span>
+              <span><span class="tool-cmd">clawspark skills pack</span> <span class="tool-desc">-- Install skill bundles</span></span>
             </li>
             <li>
               <span class="tool-bullet grey"></span>
@@ -1430,7 +1501,7 @@
         <code><span class="prompt">$</span> curl -fsSL https://clawspark.dev/install.sh | bash</code>
         <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
       </div>
-      <p class="fade-in" style="color:#555;font-size:0.85rem;text-align:center;">Works on DGX Spark, RTX GPUs (Linux + CUDA), Mac (Apple Silicon), and Jetson. Tested on DGX Spark.</p>
+      <p class="fade-in" style="color:#555;font-size:0.85rem;text-align:center;">Works on DGX Spark, RTX GPUs (Linux + CUDA), Mac (Apple Silicon), and Jetson. Fully tested on DGX Spark.</p>
     </div>
   </section>
 
