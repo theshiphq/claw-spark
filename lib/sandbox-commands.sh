@@ -61,6 +61,8 @@ _sandbox_on() {
     fi
 
     # Enable sandbox using the correct OpenClaw schema path: agents.defaults.sandbox
+    # NOTE: Do NOT set network:"none" here -- it breaks the main agent's network access.
+    # Network isolation is handled by the Docker --network=none flag in run.sh instead.
     python3 -c "
 import json, sys
 
@@ -74,9 +76,7 @@ cfg['agents']['defaults']['sandbox'] = {
     'mode': 'non-main',
     'scope': 'session',
     'docker': {
-        'image': 'clawspark-sandbox:latest',
-        'network': 'none',
-        'readOnlyRoot': True
+        'image': 'clawspark-sandbox:latest'
     }
 }
 
@@ -94,7 +94,7 @@ print('ok')
     # Persist sandbox state
     echo "true" > "${CLAWSPARK_DIR}/sandbox.state"
 
-    log_success "Sandbox enabled. Sub-agent sessions will run in Docker."
+    log_success "Sandbox enabled. Sub-agent code execution runs in Docker."
     log_info "Restart to apply: clawspark restart"
 }
 

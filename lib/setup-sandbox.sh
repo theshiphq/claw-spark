@@ -128,41 +128,16 @@ SECCOMP
         return 0
     fi
 
-    # ── Configure sandbox in openclaw.json using the correct schema path ───────
-    # OpenClaw's sandbox config lives at agents.defaults.sandbox (NOT root level)
-    local config_file="${HOME}/.openclaw/openclaw.json"
-    if [[ -f "${config_file}" ]]; then
-        python3 -c "
-import json, sys
+    # NOTE: We do NOT write sandbox config to openclaw.json during install.
+    # Setting agents.defaults.sandbox with network:"none" breaks the main agent's
+    # network access. The sandbox image and seccomp profile are ready for use via
+    # "clawspark sandbox on" which will enable it when the user explicitly wants it.
+    # The sandbox run.sh helper works standalone without any openclaw.json changes.
 
-path = sys.argv[1]
-
-with open(path, 'r') as f:
-    cfg = json.load(f)
-
-# Use the documented OpenClaw schema path: agents.defaults.sandbox
-cfg.setdefault('agents', {}).setdefault('defaults', {})
-cfg['agents']['defaults']['sandbox'] = {
-    'mode': 'non-main',
-    'scope': 'session',
-    'docker': {
-        'image': 'clawspark-sandbox:latest',
-        'network': 'none',
-        'readOnlyRoot': True
-    }
-}
-
-# Clean up any invalid root-level sandbox key from previous installs
-cfg.pop('sandbox', None)
-
-with open(path, 'w') as f:
-    json.dump(cfg, f, indent=2)
-print('ok')
-" "${config_file}" 2>> "${CLAWSPARK_LOG}" || {
-            log_warn "Could not configure sandbox in openclaw.json"
-        }
-        log_success "Sandbox configured: non-main sessions run in Docker."
-    fi
+    # Persist sandbox state as "off" (available but not active)
+    echo "false" > "${CLAWSPARK_DIR}/sandbox.state"
+    log_success "Sandbox image and seccomp profile ready."
+    log_info "Enable later with: clawspark sandbox on"
 
     # ── Helper script for manual sandbox use ──────────────────────────────────
     cat > "${sandbox_dir}/run.sh" <<'RUNSH'
