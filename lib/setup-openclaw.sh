@@ -235,17 +235,6 @@ cfg['channels']['whatsapp']['groupAllowFrom'] = ['*']
 cfg.setdefault('logging', {})
 cfg['logging']['redactSensitive'] = 'tools'
 
-# Sub-agent spawning: allow reasonable concurrency for DGX Spark
-cfg.setdefault('agents', {}).setdefault('defaults', {})
-cfg['agents']['defaults']['maxSpawnDepth'] = 2
-cfg['agents']['defaults']['maxConcurrent'] = 4
-cfg['agents']['defaults']['maxChildrenPerAgent'] = 3
-
-# Web search: DuckDuckGo via web_fetch (no API key needed)
-cfg.setdefault('tools', {})
-cfg['tools'].setdefault('web_search', {})
-cfg['tools']['web_search']['provider'] = 'duckduckgo'
-
 # Remove any stale bindings from previous installs (causes validation errors)
 cfg.pop('bindings', None)
 
@@ -261,11 +250,52 @@ print('ok')
     log_success "Agent configured: full tools (DM), SOUL.md-gated (groups), sub-agents enabled"
 }
 
+_find_openclaw_dir() {
+    # Try npm root -g first
+    local dir
+    dir="$(npm root -g 2>/dev/null)/openclaw"
+    [[ -d "${dir}" ]] && echo "${dir}" && return 0
+
+    # Try npx which openclaw to find the binary, then navigate to the package
+    local bin_path
+    bin_path="$(which openclaw 2>/dev/null || command -v openclaw 2>/dev/null)"
+    if [[ -n "${bin_path}" ]]; then
+        # Resolve symlink and find the package root
+        local real_path
+        real_path="$(readlink -f "${bin_path}" 2>/dev/null || realpath "${bin_path}" 2>/dev/null)"
+        if [[ -n "${real_path}" ]]; then
+            # Binary is usually in node_modules/.bin/ or node_modules/openclaw/bin/
+            dir="$(dirname "$(dirname "${real_path}")")"
+            [[ -d "${dir}/node_modules" ]] && echo "${dir}" && return 0
+            # Or it could be directly in the openclaw package
+            dir="$(dirname "${real_path}")"
+            while [[ "${dir}" != "/" ]]; do
+                if [[ -f "${dir}/package.json" ]] && grep -q '"openclaw"' "${dir}/package.json" 2>/dev/null; then
+                    echo "${dir}" && return 0
+                fi
+                dir="$(dirname "${dir}")"
+            done
+        fi
+    fi
+
+    # Try common global node_modules paths
+    for candidate in \
+        "/usr/lib/node_modules/openclaw" \
+        "/usr/local/lib/node_modules/openclaw" \
+        "${HOME}/.npm-global/lib/node_modules/openclaw" \
+        "${HOME}/.nvm/versions/node/$(node -v 2>/dev/null)/lib/node_modules/openclaw" \
+    ; do
+        [[ -d "${candidate}" ]] && echo "${candidate}" && return 0
+    done
+
+    return 1
+}
+
 _patch_sync_full_history() {
     log_info "Patching Baileys syncFullHistory for group support..."
     local oc_dir
-    oc_dir=$(npm root -g 2>/dev/null)/openclaw
-    if [[ ! -d "${oc_dir}" ]]; then
+    oc_dir=$(_find_openclaw_dir)
+    if [[ -z "${oc_dir}" ]] || [[ ! -d "${oc_dir}" ]]; then
         log_warn "OpenClaw global dir not found -- skipping syncFullHistory patch."
         return 0
     fi
@@ -301,8 +331,8 @@ else:
 _patch_baileys_browser() {
     log_info "Patching Baileys browser identification..."
     local oc_dir
-    oc_dir=$(npm root -g 2>/dev/null)/openclaw
-    if [[ ! -d "${oc_dir}" ]]; then
+    oc_dir=$(_find_openclaw_dir)
+    if [[ -z "${oc_dir}" ]] || [[ ! -d "${oc_dir}" ]]; then
         log_warn "OpenClaw global dir not found -- skipping Baileys patch."
         return 0
     fi
@@ -344,8 +374,8 @@ else:
 _patch_mention_detection() {
     log_info "Patching mention detection for group @mentions..."
     local oc_dir
-    oc_dir=$(npm root -g 2>/dev/null)/openclaw
-    if [[ ! -d "${oc_dir}" ]]; then
+    oc_dir=$(_find_openclaw_dir)
+    if [[ -z "${oc_dir}" ]] || [[ ! -d "${oc_dir}" ]]; then
         log_warn "OpenClaw global dir not found -- skipping mention patch."
         return 0
     fi
