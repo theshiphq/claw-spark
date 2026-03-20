@@ -135,7 +135,7 @@ print('ok')
 
     log_success "Code-level restrictions applied:"
     log_info "  tools.fs.workspaceOnly = true (file ops restricted to workspace)"
-    log_info "  gateway.nodes.denyCommands = [${#deny_commands[@]:-20+} blocked patterns]"
+    log_info "  gateway.nodes.denyCommands = [21 blocked patterns]"
 }
 
 # ── UFW configuration ──────────────────────────────────────────────────────
