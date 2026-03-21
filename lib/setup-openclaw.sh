@@ -17,8 +17,13 @@ setup_openclaw() {
         log_success "OpenClaw is already installed (${current_ver})."
     else
         log_info "Installing OpenClaw globally via npm..."
+        # aarch64 Linux: @discordjs/opus needs NEON intrinsics flag to compile
+        local _npm_env=""
+        if [[ "$(uname -m)" == "aarch64" && "$(uname)" != "Darwin" ]]; then
+            _npm_env="CFLAGS='-DOPUS_ARM_MAY_HAVE_NEON_INTR'"
+        fi
         # Try without sudo first (Homebrew npm on macOS doesn't need it)
-        (npm install -g openclaw@latest 2>>"${CLAWSPARK_LOG}" || sudo npm install -g openclaw@latest) >> "${CLAWSPARK_LOG}" 2>&1 &
+        (eval ${_npm_env} npm install -g openclaw@latest 2>>"${CLAWSPARK_LOG}" || eval ${_npm_env} sudo npm install -g openclaw@latest) >> "${CLAWSPARK_LOG}" 2>&1 &
         spinner $! "Installing OpenClaw..."
         # Refresh shell hash table so check_command finds the new binary
         hash -r 2>/dev/null || true
@@ -219,10 +224,16 @@ _write_openclaw_config() {
     [[ -d "${HOME}/.npm-global/bin" ]] && computed_path="${HOME}/.npm-global/bin:${computed_path}"
     # Add snap bin (Ubuntu)
     [[ -d "/snap/bin" ]] && computed_path="${computed_path}:/snap/bin"
+    # Jetson: include CUDA library path so Ollama and agent processes find GPU
+    local cuda_ld_path=""
+    if [[ "${HW_PLATFORM:-}" == "jetson" ]] && [[ -d "/usr/local/cuda/lib64" ]]; then
+        cuda_ld_path="LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu/tegra"
+    fi
     cat > "${env_file}" <<ENVEOF
 OLLAMA_API_KEY=ollama
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 PATH=${computed_path}
+${cuda_ld_path}
 ENVEOF
     chmod 600 "${env_file}"
 }

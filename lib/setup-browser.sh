@@ -39,13 +39,33 @@ setup_browser() {
     else
         log_info "No browser found. Installing Chromium for browser automation..."
         if check_command apt-get; then
-            (sudo apt-get install -y chromium-browser 2>/dev/null || sudo apt-get install -y chromium) >> "${CLAWSPARK_LOG}" 2>&1 &
-            spinner $! "Installing Chromium..."
-            if check_command chromium-browser || check_command chromium; then
-                browser_bin=$(command -v chromium-browser 2>/dev/null || command -v chromium)
-                log_success "Chromium installed: ${browser_bin}"
+            # Ubuntu 20.04+ and Jetson: apt chromium-browser installs a snap stub
+            # that doesn't work headless or under systemd. Prefer google-chrome.
+            local _snap_chromium=false
+            if command -v snap &>/dev/null && snap list chromium &>/dev/null 2>&1; then
+                _snap_chromium=true
+            fi
+            if [[ "${_snap_chromium}" == "true" ]] || dpkg -l chromium-browser 2>/dev/null | grep -q "^ii.*snap"; then
+                log_warn "Snap Chromium detected (broken for headless/systemd). Trying Google Chrome..."
+            fi
+            # Try Google Chrome first (always works headless)
+            if ! check_command google-chrome-stable && ! check_command google-chrome; then
+                (sudo apt-get install -y chromium-browser 2>/dev/null || sudo apt-get install -y chromium) >> "${CLAWSPARK_LOG}" 2>&1 &
+                spinner $! "Installing Chromium..."
+            fi
+            if check_command google-chrome-stable; then
+                browser_bin="google-chrome-stable"
+            elif check_command google-chrome; then
+                browser_bin="google-chrome"
+            elif check_command chromium-browser; then
+                browser_bin="chromium-browser"
+            elif check_command chromium; then
+                browser_bin="chromium"
+            fi
+            if [[ -n "${browser_bin}" ]]; then
+                log_success "Browser installed: ${browser_bin}"
             else
-                log_warn "Chromium installation failed. Browser tool will not be available."
+                log_warn "Browser installation failed. Browser tool will not be available."
                 return 0
             fi
         elif check_command brew; then

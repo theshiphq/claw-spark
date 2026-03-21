@@ -183,19 +183,41 @@ _select_model_curated_fallback() {
             fi
             ;;
         rtx)
-            if (( HW_GPU_VRAM_MB >= 24576 )); then
-                model_ids=("qwen3.5:35b-a3b" "glm-4.7-flash")
-                model_names=("Qwen 3.5 35B-A3B" "GLM 4.7 Flash")
+            local vram_gb=$(( ${HW_GPU_VRAM_MB:-0} / 1024 ))
+            if (( vram_gb >= 24 )); then
+                # RTX 3090, 4090, A5000+
+                model_ids=("qwen3.5:35b-a3b" "qwen3-coder:30b" "glm-4.7-flash")
+                model_names=("Qwen 3.5 35B-A3B" "Qwen3 Coder 30B" "GLM 4.7 Flash")
                 model_labels=(
-                    "qwen3.5:35b-a3b (default) -- MoE, fits 24 GB"
+                    "qwen3.5:35b-a3b (default) -- MoE, fits 24GB (~18GB model)"
+                    "qwen3-coder:30b -- coding-focused MoE"
                     "glm-4.7-flash -- compact & fast"
                 )
-            else
-                model_ids=("glm-4.7-flash" "qwen3:8b")
-                model_names=("GLM 4.7 Flash" "Qwen3 8B")
+            elif (( vram_gb >= 16 )); then
+                # RTX 3080 16GB, 4080, A4000
+                model_ids=("glm-4.7-flash" "qwen3:14b" "qwen3:8b")
+                model_names=("GLM 4.7 Flash" "Qwen3 14B" "Qwen3 8B")
                 model_labels=(
-                    "glm-4.7-flash (default) -- fits smaller VRAM"
-                    "qwen3:8b -- lightweight 8B model"
+                    "glm-4.7-flash (default) -- fits 16GB"
+                    "qwen3:14b -- mid-size model"
+                    "qwen3:8b -- lightweight"
+                )
+            elif (( vram_gb >= 12 )); then
+                # RTX 3060 12GB
+                model_ids=("qwen3:14b" "qwen3:8b" "glm-4.7-flash")
+                model_names=("Qwen3 14B" "Qwen3 8B" "GLM 4.7 Flash")
+                model_labels=(
+                    "qwen3:14b (default) -- fits 12GB"
+                    "qwen3:8b -- smaller, faster"
+                    "glm-4.7-flash -- compact"
+                )
+            else
+                # RTX 3070/4060/4060 Ti (8GB), RTX 2060 (6GB)
+                model_ids=("qwen3:8b" "phi4-mini")
+                model_names=("Qwen3 8B" "Phi4 Mini")
+                model_labels=(
+                    "qwen3:8b (default) -- fits 8GB"
+                    "phi4-mini -- very compact"
                 )
             fi
             ;;

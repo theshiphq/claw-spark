@@ -105,10 +105,24 @@ detect_hardware() {
         fi
     fi
 
-    # DGX Spark has 128 GB unified memory — override if detected
+    # Unified memory platforms: VRAM = system RAM (nvidia-smi reports N/A)
+    # This must come AFTER nvidia-smi parsing which may have reset VRAM to 0
     if [[ "${HW_PLATFORM}" == "dgx-spark" ]]; then
         HW_TOTAL_RAM_MB=131072   # 128 * 1024
         HW_GPU_VRAM_MB=131072
+    elif [[ "${HW_PLATFORM}" == "jetson" && "${HW_GPU_VRAM_MB}" -eq 0 ]]; then
+        # Jetson uses unified memory; nvidia-smi returns N/A for VRAM
+        HW_GPU_VRAM_MB="${HW_TOTAL_RAM_MB}"
+    fi
+
+    # ── Validate NVIDIA driver version (Ollama needs >= 531 for GPU) ────────
+    if [[ "${HW_DRIVER_VERSION}" != "n/a" && "${HW_DRIVER_VERSION}" != "Metal" ]]; then
+        local driver_major
+        driver_major=$(echo "${HW_DRIVER_VERSION}" | cut -d. -f1)
+        if [[ "${driver_major}" =~ ^[0-9]+$ ]] && (( driver_major > 0 && driver_major < 531 )); then
+            log_warn "NVIDIA driver ${HW_DRIVER_VERSION} is too old for GPU inference (need >= 531)."
+            log_warn "Ollama will fall back to CPU-only mode. Update driver: sudo apt install nvidia-driver-535"
+        fi
     fi
 
     # ── Export globals ──────────────────────────────────────────────────────

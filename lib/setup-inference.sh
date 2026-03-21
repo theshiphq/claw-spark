@@ -8,6 +8,14 @@ setup_inference() {
     log_info "Setting up inference engine (Ollama)..."
     hr
 
+    # ── Jetson: set CUDA library path so Ollama can find GPU ─────────────────
+    if [[ "${HW_PLATFORM:-}" == "jetson" ]] && [[ -d "/usr/local/cuda/lib64" ]]; then
+        if [[ "${LD_LIBRARY_PATH:-}" != */usr/local/cuda/lib64* ]]; then
+            export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu/tegra:${LD_LIBRARY_PATH:-}"
+            log_info "Set LD_LIBRARY_PATH for Jetson CUDA: ${LD_LIBRARY_PATH}"
+        fi
+    fi
+
     # ── Install Ollama if missing ───────────────────────────────────────────
     if ! check_command ollama; then
         log_info "Ollama not found — installing..."
@@ -55,6 +63,10 @@ setup_inference() {
             log_info "Launched Ollama.app."
         elif check_command systemctl && systemctl is-enabled ollama &>/dev/null; then
             sudo systemctl start ollama >> "${CLAWSPARK_LOG}" 2>&1 || true
+        elif check_command snap && snap list ollama &>/dev/null 2>&1; then
+            # DGX Spark / some Linux: Ollama installed as snap
+            log_info "Ollama is a snap package -- starting via snap."
+            sudo snap start ollama 2>> "${CLAWSPARK_LOG}" || true
         else
             # Start as a background process
             nohup ollama serve >> "${CLAWSPARK_DIR}/ollama.log" 2>&1 &
