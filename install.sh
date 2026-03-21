@@ -329,7 +329,7 @@ secure_setup
 
 # ── Start node host (after all config changes are done) ───────────────────
 # Skip if systemd already started the node host (step 16)
-if systemctl is-active --quiet clawspark-nodehost.service 2>/dev/null; then
+if check_command systemctl && systemctl is-active --quiet clawspark-nodehost.service 2>/dev/null; then
     log_info "Node host already running via systemd."
 else
     log_info "Starting node host..."

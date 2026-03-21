@@ -17,7 +17,8 @@ setup_openclaw() {
         log_success "OpenClaw is already installed (${current_ver})."
     else
         log_info "Installing OpenClaw globally via npm..."
-        (sudo npm install -g openclaw@latest) >> "${CLAWSPARK_LOG}" 2>&1 &
+        # Try without sudo first (Homebrew npm on macOS doesn't need it)
+        (npm install -g openclaw@latest 2>>"${CLAWSPARK_LOG}" || sudo npm install -g openclaw@latest) >> "${CLAWSPARK_LOG}" 2>&1 &
         spinner $! "Installing OpenClaw..."
         # Refresh shell hash table so check_command finds the new binary
         hash -r 2>/dev/null || true

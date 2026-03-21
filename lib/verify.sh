@@ -28,6 +28,7 @@ verify_installation() {
         dgx-spark) platform_label="DGX Spark (${ram_gb}GB unified memory)" ;;
         jetson)    platform_label="Jetson (${ram_gb}GB)" ;;
         rtx)       platform_label="RTX (${HW_GPU_VRAM_MB:-0}MB VRAM)" ;;
+        mac)       platform_label="macOS Apple Silicon (${ram_gb}GB unified)" ;;
         *)         platform_label="Generic (${ram_gb}GB RAM)" ;;
     esac
     _check_pass "Hardware: ${platform_label}"
@@ -54,7 +55,7 @@ verify_installation() {
         local oc_ver
         oc_ver=$(openclaw --version 2>/dev/null || echo "unknown")
         local gw_status="gateway not running"
-        if systemctl is-active --quiet clawspark-gateway.service 2>/dev/null; then
+        if check_command systemctl && systemctl is-active --quiet clawspark-gateway.service 2>/dev/null; then
             gw_status="gateway running (systemd)"
         elif [[ -f "${CLAWSPARK_DIR}/gateway.pid" ]]; then
             local gw_pid
@@ -78,7 +79,7 @@ verify_installation() {
     fi
 
     # ── 7. Node host ──────────────────────────────────────────────────────
-    if systemctl is-active --quiet clawspark-nodehost.service 2>/dev/null; then
+    if check_command systemctl && systemctl is-active --quiet clawspark-nodehost.service 2>/dev/null; then
         _check_pass "Node host: running (systemd)"
     elif [[ -f "${CLAWSPARK_DIR}/node.pid" ]]; then
         local node_pid

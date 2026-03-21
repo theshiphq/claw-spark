@@ -23,7 +23,7 @@ select_model() {
         dgx-spark)
             _select_model_curated_spark
             ;;
-        *)
+        mac|jetson|rtx|generic|*)
             # Try llmfit first, fall back to curated list
             _select_model_llmfit || _select_model_curated_fallback
             ;;
@@ -153,6 +153,34 @@ _select_model_curated_fallback() {
                 "nemotron-3-nano (default) -- optimized for Jetson"
                 "glm-4.7-flash -- compact & fast"
             )
+            ;;
+        mac)
+            # Apple Silicon with unified memory -- model size depends on RAM
+            local ram_gb=$(( ${HW_TOTAL_RAM_MB:-0} / 1024 ))
+            if (( ram_gb >= 32 )); then
+                model_ids=("qwen3.5:35b-a3b" "qwen3-coder:30b" "glm-4.7-flash")
+                model_names=("Qwen 3.5 35B-A3B" "Qwen3 Coder 30B" "GLM 4.7 Flash")
+                model_labels=(
+                    "qwen3.5:35b-a3b (default) -- MoE, fits 32GB+ Mac"
+                    "qwen3-coder:30b -- coding-focused MoE"
+                    "glm-4.7-flash -- compact & fast"
+                )
+            elif (( ram_gb >= 16 )); then
+                model_ids=("glm-4.7-flash" "qwen3:8b" "deepseek-v2")
+                model_names=("GLM 4.7 Flash" "Qwen3 8B" "DeepSeek V2")
+                model_labels=(
+                    "glm-4.7-flash (default) -- good balance for 16GB"
+                    "qwen3:8b -- lightweight 8B model"
+                    "deepseek-v2 -- MoE, good coding"
+                )
+            else
+                model_ids=("qwen3:8b" "glm-4.7-flash")
+                model_names=("Qwen3 8B" "GLM 4.7 Flash")
+                model_labels=(
+                    "qwen3:8b (default) -- fits 8GB Mac"
+                    "glm-4.7-flash -- compact"
+                )
+            fi
             ;;
         rtx)
             if (( HW_GPU_VRAM_MB >= 24576 )); then

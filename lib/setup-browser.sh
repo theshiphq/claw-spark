@@ -18,6 +18,22 @@ setup_browser() {
         browser_bin="google-chrome-stable"
     fi
 
+    # macOS: check common app bundle paths if no CLI binary found
+    if [[ -z "${browser_bin}" && "$(uname)" == "Darwin" ]]; then
+        local -a mac_browsers=(
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            "/Applications/Chromium.app/Contents/MacOS/Chromium"
+            "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+            "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+        )
+        for candidate in "${mac_browsers[@]}"; do
+            if [[ -x "${candidate}" ]]; then
+                browser_bin="${candidate}"
+                break
+            fi
+        done
+    fi
+
     if [[ -n "${browser_bin}" ]]; then
         log_success "Browser found: ${browser_bin}"
     else

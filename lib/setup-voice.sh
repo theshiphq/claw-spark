@@ -66,12 +66,24 @@ setup_voice() {
     local whisper_config_dir="${HOME}/.openclaw/skills/local-whisper"
     mkdir -p "${whisper_config_dir}"
 
+    # Detect compute device: CUDA (NVIDIA), Metal (macOS), or CPU fallback
+    local whisper_device="cpu"
+    local whisper_compute="int8"
+    if check_command nvidia-smi && nvidia-smi &>/dev/null; then
+        whisper_device="cuda"
+        whisper_compute="float16"
+    elif [[ "$(uname)" == "Darwin" ]]; then
+        # macOS Apple Silicon uses Metal via CoreML/ANE acceleration
+        whisper_device="auto"
+        whisper_compute="int8"
+    fi
+
     cat > "${whisper_config_dir}/config.json" <<WCEOF
 {
   "model": "${whisper_model}",
   "language": "auto",
-  "device": "cuda",
-  "compute_type": "float16"
+  "device": "${whisper_device}",
+  "compute_type": "${whisper_compute}"
 }
 WCEOF
     log_info "Whisper config written (model=${whisper_model})."

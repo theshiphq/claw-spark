@@ -39,13 +39,10 @@ setup_mcp() {
         printf '  %s->%s Installing %s%s%s ... ' "${CYAN}" "${RESET}" "${BOLD}" "${short_name}" "${RESET}"
         if npm install -g "${pkg}" >> "${CLAWSPARK_LOG}" 2>&1; then
             printf '%s✓%s\n' "${GREEN}" "${RESET}"
+        elif sudo npm install -g "${pkg}" >> "${CLAWSPARK_LOG}" 2>&1; then
+            printf '%s✓%s\n' "${GREEN}" "${RESET}"
         else
-            # Try without global (user-local)
-            if npm install -g "${pkg}" --prefix "${HOME}/.local" >> "${CLAWSPARK_LOG}" 2>&1; then
-                printf '%s✓%s (user-local)\n' "${GREEN}" "${RESET}"
-            else
-                printf '%s✗%s\n' "${YELLOW}" "${RESET}"
-            fi
+            printf '%s✗%s\n' "${YELLOW}" "${RESET}"
         fi
     done
 

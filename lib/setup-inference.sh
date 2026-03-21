@@ -10,15 +10,36 @@ setup_inference() {
 
     # ── Install Ollama if missing ───────────────────────────────────────────
     if ! check_command ollama; then
-        log_info "Ollama not found — installing (this needs sudo)..."
-        # Run in foreground so sudo can prompt for password
-        if curl -fsSL https://ollama.com/install.sh | sh >> "${CLAWSPARK_LOG}" 2>&1; then
-            log_success "Ollama installed."
+        log_info "Ollama not found — installing..."
+        if [[ "$(uname)" == "Darwin" ]]; then
+            # macOS: check for Ollama.app first, then try Homebrew
+            if [[ -d "/Applications/Ollama.app" ]]; then
+                log_info "Ollama.app found but not on PATH. Adding..."
+                export PATH="/Applications/Ollama.app/Contents/Resources:${PATH}"
+            elif check_command brew; then
+                log_info "Installing Ollama via Homebrew..."
+                (brew install ollama) >> "${CLAWSPARK_LOG}" 2>&1 &
+                spinner $! "Installing Ollama..."
+            else
+                log_info "Installing Ollama via install script..."
+                curl -fsSL https://ollama.com/install.sh | sh >> "${CLAWSPARK_LOG}" 2>&1 || {
+                    log_warn "Ollama install script returned an error."
+                }
+            fi
         else
-            log_warn "Ollama install script returned an error."
+            # Linux: use the official install script
+            log_info "Installing via official script (this needs sudo)..."
+            if curl -fsSL https://ollama.com/install.sh | sh >> "${CLAWSPARK_LOG}" 2>&1; then
+                log_success "Ollama installed."
+            else
+                log_warn "Ollama install script returned an error."
+            fi
         fi
+        # Refresh PATH and check
+        hash -r 2>/dev/null || true
         if ! check_command ollama; then
             log_error "Ollama installation failed. Check ${CLAWSPARK_LOG} for details."
+            log_info "Install manually: https://ollama.com/download"
             return 1
         fi
     else
@@ -28,7 +49,11 @@ setup_inference() {
     # ── Start Ollama service ────────────────────────────────────────────────
     if ! _ollama_is_running; then
         log_info "Starting Ollama service..."
-        if check_command systemctl && systemctl is-enabled ollama &>/dev/null; then
+        if [[ "$(uname)" == "Darwin" ]] && [[ -d "/Applications/Ollama.app" ]]; then
+            # macOS: launch the Ollama app (it runs as a menubar service)
+            open -a Ollama 2>/dev/null || true
+            log_info "Launched Ollama.app."
+        elif check_command systemctl && systemctl is-enabled ollama &>/dev/null; then
             sudo systemctl start ollama >> "${CLAWSPARK_LOG}" 2>&1 || true
         else
             # Start as a background process

@@ -92,6 +92,19 @@ detect_hardware() {
         fi
     fi
 
+    # macOS with Apple Silicon: detect GPU via system_profiler
+    if [[ "${HW_PLATFORM}" == "generic" && "$(uname)" == "Darwin" ]]; then
+        local chip_info
+        chip_info=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo "")
+        if echo "${chip_info}" | grep -qi "Apple"; then
+            HW_PLATFORM="mac"
+            HW_GPU_NAME="Apple Silicon (${chip_info})"
+            # Apple Silicon uses unified memory; GPU VRAM = system RAM
+            HW_GPU_VRAM_MB="${HW_TOTAL_RAM_MB}"
+            HW_DRIVER_VERSION="Metal"
+        fi
+    fi
+
     # DGX Spark has 128 GB unified memory — override if detected
     if [[ "${HW_PLATFORM}" == "dgx-spark" ]]; then
         HW_TOTAL_RAM_MB=131072   # 128 * 1024
@@ -111,6 +124,7 @@ detect_hardware() {
         dgx-spark) platform_label="NVIDIA DGX Spark" ;;
         jetson)    platform_label="NVIDIA Jetson" ;;
         rtx)       platform_label="NVIDIA RTX Desktop" ;;
+        mac)       platform_label="macOS Apple Silicon" ;;
         *)         platform_label="Generic / Unknown GPU" ;;
     esac
 
