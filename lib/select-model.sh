@@ -186,27 +186,30 @@ _select_model_curated_fallback() {
 }
 
 # ── Shared: present choices and set SELECTED_MODEL_ID/NAME ────────────────
+# Uses array names (Bash 3.2 compatible: no nameref)
 _present_model_choices() {
-    local -n _ids=$1
-    local -n _names=$2
-    local -n _labels=$3
+    local _ids_name="$1"
+    local _names_name="$2"
+    local _labels_name="$3"
     local _default=$4
+    local _labels_len
+    eval "_labels_len=\${#${_labels_name}[@]}"
 
     local choice
-    choice=$(prompt_choice "Which model would you like to run?" _labels "${_default}")
+    choice=$(prompt_choice "Which model would you like to run?" "${_labels_name}" "${_default}")
 
     if [[ "${choice}" == "Let me pick my own model" ]]; then
         if [[ "${CLAWSPARK_DEFAULTS}" == "true" ]]; then
-            SELECTED_MODEL_ID="${_ids[$_default]}"
-            SELECTED_MODEL_NAME="${_names[$_default]}"
+            eval "SELECTED_MODEL_ID=\${${_ids_name}[$_default]}"
+            eval "SELECTED_MODEL_NAME=\${${_names_name}[$_default]}"
         else
             printf '\n  %sEnter the Ollama model ID (e.g. llama3.1:8b):%s ' "${BOLD}" "${RESET}" >/dev/tty
             local custom_id
             read -r custom_id </dev/tty || custom_id=""
             if [[ -z "${custom_id}" ]]; then
                 log_warn "No model entered -- falling back to default."
-                SELECTED_MODEL_ID="${_ids[$_default]}"
-                SELECTED_MODEL_NAME="${_names[$_default]}"
+                eval "SELECTED_MODEL_ID=\${${_ids_name}[$_default]}"
+                eval "SELECTED_MODEL_NAME=\${${_names_name}[$_default]}"
             else
                 SELECTED_MODEL_ID="${custom_id}"
                 SELECTED_MODEL_NAME="${custom_id}"
@@ -214,18 +217,21 @@ _present_model_choices() {
         fi
     else
         local i found=false
-        for i in $(seq 0 $(( ${#_labels[@]} - 2 ))); do
-            if [[ "${_labels[$i]}" == "${choice}" ]]; then
-                SELECTED_MODEL_ID="${_ids[$i]}"
-                SELECTED_MODEL_NAME="${_names[$i]}"
+        local labels_last=$(( _labels_len - 2 ))
+        for i in $(seq 0 "${labels_last}"); do
+            local label_val
+            eval "label_val=\${${_labels_name}[$i]}"
+            if [[ "${label_val}" == "${choice}" ]]; then
+                eval "SELECTED_MODEL_ID=\${${_ids_name}[$i]}"
+                eval "SELECTED_MODEL_NAME=\${${_names_name}[$i]}"
                 found=true
                 break
             fi
         done
         if [[ "${found}" != "true" ]]; then
             log_warn "Could not match selection -- using default model."
-            SELECTED_MODEL_ID="${_ids[$_default]}"
-            SELECTED_MODEL_NAME="${_names[$_default]}"
+            eval "SELECTED_MODEL_ID=\${${_ids_name}[$_default]}"
+            eval "SELECTED_MODEL_NAME=\${${_names_name}[$_default]}"
         fi
     fi
 }

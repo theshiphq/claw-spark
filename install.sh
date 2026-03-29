@@ -225,7 +225,7 @@ if [[ -z "${FLAG_MESSAGING}" ]]; then
     FLAG_MESSAGING=$(prompt_choice "Connect a messaging platform? (Web UI is always available)" msg_opts 3)
 fi
 # Lowercase for consistent matching downstream
-FLAG_MESSAGING="${FLAG_MESSAGING,,}"
+FLAG_MESSAGING=$(to_lower "${FLAG_MESSAGING}")
 export FLAG_MESSAGING
 log_info "Messaging: ${FLAG_MESSAGING}"
 

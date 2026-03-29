@@ -15,7 +15,7 @@ setup_messaging() {
         messaging_choice=$(prompt_choice "Which messaging channel(s) would you like?" options 0)
     fi
 
-    messaging_choice="${messaging_choice,,}"  # lowercase
+    messaging_choice=$(to_lower "${messaging_choice}")
     export MESSAGING_CHOICE="${messaging_choice}"
 
     case "${messaging_choice}" in

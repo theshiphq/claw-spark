@@ -27,6 +27,9 @@ else
     RESET=$'\033[0m'
 fi
 
+# ── Helpers (Bash 3.2 compatible) ───────────────────────────────────────────
+to_lower() { echo "$1" | tr '[:upper:]' '[:lower:]'; }
+
 # ── Logging ─────────────────────────────────────────────────────────────────
 _ts() { date '+%H:%M:%S'; }
 
@@ -69,13 +72,14 @@ _log_to_file() {
 #   result=$(prompt_choice "Pick one:" options 0)
 prompt_choice() {
     local question="$1"
-    local -n _options=$2          # nameref to the array
+    local options_name="$2"       # array name (Bash 3.2 compatible: no nameref)
     local default_idx="${3:-0}"
-    local count=${#_options[@]}
+    local count
+    eval "count=\${#${options_name}[@]}"
 
     # If running in defaults mode, return default immediately
     if [[ "${CLAWSPARK_DEFAULTS}" == "true" ]]; then
-        printf '%s' "${_options[$default_idx]}"
+        eval "printf '%s' \"\${${options_name}[$default_idx]}\""
         return 0
     fi
 
@@ -87,7 +91,9 @@ prompt_choice() {
         if [[ "$i" -eq "$default_idx" ]]; then
             marker=" ${CYAN}(default)${RESET}"
         fi
-        printf '  %s%d)%s %s%s\n' "${GREEN}" $(( i + 1 )) "${RESET}" "${_options[$i]}" "${marker}" >/dev/tty
+        local opt
+        eval "opt=\${${options_name}[$i]}"
+        printf '  %s%d)%s %s%s\n' "${GREEN}" $(( i + 1 )) "${RESET}" "${opt}" "${marker}" >/dev/tty
     done
 
     local selection
@@ -96,12 +102,12 @@ prompt_choice() {
         read -r selection </dev/tty || selection=""
         # Empty input → default
         if [[ -z "${selection}" ]]; then
-            printf '%s' "${_options[$default_idx]}"
+            eval "printf '%s' \"\${${options_name}[$default_idx]}\""
             return 0
         fi
         # Validate numeric input
         if [[ "${selection}" =~ ^[0-9]+$ ]] && (( selection >= 1 && selection <= count )); then
-            printf '%s' "${_options[$(( selection - 1 ))]}"
+            eval "printf '%s' \"\${${options_name}[$(( selection - 1 ))]}\""
             return 0
         fi
         printf '  %sPlease enter a number between 1 and %d%s\n' "${YELLOW}" "${count}" "${RESET}" >/dev/tty
@@ -124,7 +130,7 @@ prompt_yn() {
     printf '\n%s%s %s%s ' "${BOLD}" "${question}" "${hint}" "${RESET}" >/dev/tty
     local answer
     read -r answer </dev/tty || answer=""
-    answer="${answer,,}"  # lowercase
+    answer=$(to_lower "${answer}")
 
     if [[ -z "${answer}" ]]; then
         [[ "${default}" == "y" ]] && return 0 || return 1

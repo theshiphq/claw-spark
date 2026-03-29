@@ -80,7 +80,7 @@ if command -v ollama &>/dev/null; then
         printf '\n  %sRemove all Ollama models? This frees disk space but re-download needed later.%s\n' "${YELLOW}" "${RESET}"
         printf '  %s[y/N]:%s ' "${BOLD}" "${RESET}"
         read -r remove_models
-        remove_models="${remove_models,,}"
+        remove_models=$(echo "${remove_models}" | tr '[:upper:]' '[:lower:]')
     fi
 
     if [[ "${remove_models}" =~ ^y ]]; then
@@ -136,7 +136,7 @@ if command -v ufw &>/dev/null; then
         printf '\n  %sRevert firewall (UFW) rules added by clawspark?%s\n' "${YELLOW}" "${RESET}"
         printf '  %s[y/N]:%s ' "${BOLD}" "${RESET}"
         read -r revert_fw
-        revert_fw="${revert_fw,,}"
+        revert_fw=$(echo "${revert_fw}" | tr '[:upper:]' '[:lower:]')
     fi
 
     if [[ "${revert_fw}" =~ ^y ]]; then

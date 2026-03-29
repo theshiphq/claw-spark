@@ -46,7 +46,7 @@ setup_voice() {
 
     # ── Install WhatsApp voice integration if applicable ────────────────────
     local messaging="${FLAG_MESSAGING:-${MESSAGING_CHOICE:-skip}}"
-    messaging="${messaging,,}"  # lowercase
+    messaging=$(to_lower "${messaging}")
     if [[ "${messaging}" == "whatsapp" || "${messaging}" == "both" ]]; then
         local voice_skill_dir="${HOME}/.openclaw/workspace/skills/whatsapp-voice-chat-integration-open-source"
         if [[ -d "${voice_skill_dir}" ]]; then
