@@ -30,6 +30,18 @@ After editing, apply changes with:
 clawspark skills sync
 ```
 
+To scan installed skills for suspicious patterns (credential theft, obfuscation, exfiltration):
+
+```bash
+clawspark skills audit
+```
+
+To run a full system diagnostic when troubleshooting:
+
+```bash
+clawspark diagnose
+```
+
 ## OpenClaw Configuration
 
 Location: `~/.openclaw/openclaw.json`

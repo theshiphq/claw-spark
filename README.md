@@ -128,6 +128,7 @@ clawspark skills pack full         # Everything (10 skills)
 clawspark skills add <name>
 clawspark skills remove <name>
 clawspark skills sync
+clawspark skills audit            # Security scan all installed skills
 ```
 
 ## Multi-Model Support
@@ -195,6 +196,27 @@ clawspark takes security seriously because your AI agent has access to your data
 - Optional Docker sandbox for code execution isolation
 - Air-gap mode for complete network isolation: `clawspark airgap on`
 - OpenAI-compatible API gateway (use your local AI as a drop-in OpenAI replacement)
+- Skill security scanning against 341+ known malicious ClawHub patterns
+
+### Skill Security Audit
+
+OpenClaw's ClawHub marketplace has had malicious skills (data theft, credential exfiltration). clawspark protects you:
+
+```bash
+clawspark skills audit          # Scan all installed skills for suspicious patterns
+```
+
+The audit checks for network exfiltration, credential access, obfuscation, path traversal, and process spawning across 30+ patterns. Skills are verified against a curated allowlist, and file hashes are tracked to detect unexpected changes.
+
+### Diagnostics
+
+When something goes wrong, get a full system health report:
+
+```bash
+clawspark diagnose              # Full diagnostic (alias: clawspark doctor)
+```
+
+Checks hardware, GPU, Ollama, OpenClaw, skills, network ports, security config, and logs. Generates a shareable debug report at `~/.clawspark/diagnose-report.txt`.
 
 ## Service Management
 
@@ -231,12 +253,14 @@ clawspark model vision       # Set or show the vision model
 clawspark skills list        # Show installed skills
 clawspark skills sync        # Apply skills.yaml changes
 clawspark skills pack        # Install a curated skill bundle
+clawspark skills audit       # Security scan installed skills
 clawspark sandbox on|off     # Toggle Docker sandbox
 clawspark sandbox status     # Show sandbox configuration
 clawspark tools list         # Show available agent tools
 clawspark tools enable       # Enable optional tools
 clawspark tailscale setup    # Configure remote access
 clawspark airgap on|off      # Toggle air-gap mode
+clawspark diagnose           # Full system diagnostics (alias: doctor)
 clawspark logs               # Tail all service logs
 clawspark uninstall          # Remove everything
 ```
@@ -260,6 +284,21 @@ clawspark builds on the work of several excellent open-source projects:
 - **[Whisper](https://github.com/openai/whisper)** -- Open-source speech-to-text (by OpenAI)
 - **[ClawMetry](https://github.com/vivekchand/clawmetry)** -- Observability dashboard for OpenClaw
 - **[Qwen](https://github.com/QwenLM/Qwen)** -- The model family that runs beautifully on DGX Spark
+
+## Testing
+
+clawspark includes a test suite using [bats](https://github.com/bats-core/bats-core) (Bash Automated Testing System). 73 tests cover CLI routing, YAML parsing, security functions, and core utilities.
+
+```bash
+bash tests/run.sh
+```
+
+The test runner auto-installs bats if needed. Tests are organized into:
+
+- `tests/common.bats` -- Logging, color constants, helpers (27 tests)
+- `tests/skills.bats` -- YAML parsing, skill add/remove, packs (16 tests)
+- `tests/security.bats` -- Token generation, permissions, deny lists (11 tests)
+- `tests/cli.bats` -- Version, help, command routing, error handling (19 tests)
 
 ## Contributing
 

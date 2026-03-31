@@ -32,50 +32,10 @@ setup_skills() {
         cp "${skills_file}" "${CLAWSPARK_DIR}/skills.yaml"
     fi
 
-    # ── Parse enabled skills (simple YAML parser) ──────────────────────────
-    # Supports two formats:
-    #   Format A (simple):   - skill-slug
-    #   Format B (detailed): - name: skill-slug
     local -a skills=()
-    local in_enabled=false
-
-    while IFS= read -r line; do
-        # Skip comments and blank lines
-        [[ "${line}" =~ ^[[:space:]]*# ]] && continue
-        [[ -z "${line// }" ]] && continue
-
-        # Detect the "enabled:" section (may be nested under "skills:")
-        if [[ "${line}" =~ enabled:[[:space:]]*$ ]]; then
-            in_enabled=true
-            continue
-        fi
-
-        # A key at the same or higher indentation level ends the section
-        # (e.g. "custom:", another top-level key)
-        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]{0,3}[a-zA-Z] ]] && [[ ! "${line}" =~ ^[[:space:]]*- ]]; then
-            in_enabled=false
-            continue
-        fi
-
-        # Format B: "- name: skill-slug"
-        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+name:[[:space:]]+(.*) ]]; then
-            local slug="${BASH_REMATCH[1]}"
-            slug="${slug## }"
-            slug="${slug%% }"
-            skills+=("${slug}")
-            continue
-        fi
-
-        # Format A: "- skill-slug"
-        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*) ]]; then
-            local slug="${BASH_REMATCH[1]}"
-            slug="${slug## }"
-            slug="${slug%% }"
-            # Skip if this is a YAML key (e.g. "name: ...")
-            [[ "${slug}" =~ ^[a-zA-Z]+: ]] && continue
-            skills+=("${slug}")
-        fi
-    done < "${skills_file}"
+    while IFS= read -r slug; do
+        skills+=("${slug}")
+    done < <(_parse_enabled_skills "${skills_file}")
 
     if [[ ${#skills[@]} -eq 0 ]]; then
         log_warn "No skills found under 'enabled:' in ${skills_file}."

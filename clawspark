@@ -40,6 +40,24 @@ _load_sandbox_commands() {
 
 _load_sandbox_commands
 
+# ── Source diagnose module ────────────────────────────────────────────────
+_load_diagnose() {
+    local lib_dir="${CLAWSPARK_DIR}/lib"
+    if [[ -f "${lib_dir}/diagnose.sh" ]]; then
+        # shellcheck source=/dev/null
+        source "${lib_dir}/diagnose.sh"
+    fi
+}
+
+# ── Source skill audit module ─────────────────────────────────────────────
+_load_skill_audit() {
+    local lib_dir="${CLAWSPARK_DIR}/lib"
+    if [[ -f "${lib_dir}/skill-audit.sh" ]]; then
+        # shellcheck source=/dev/null
+        source "${lib_dir}/skill-audit.sh"
+    fi
+}
+
 # ── Version ─────────────────────────────────────────────────────────────────
 CLAWSPARK_VERSION="2.0.0"
 
@@ -57,6 +75,7 @@ ${BOLD}Commands:${RESET}
   ${GREEN}skills add <name>${RESET}   Add a skill and install it
   ${GREEN}skills remove <name>${RESET} Remove a skill
   ${GREEN}skills pack [name]${RESET}  Install a curated skill pack (or list available packs)
+  ${GREEN}skills audit${RESET}        Scan installed skills for security issues
   ${GREEN}benchmark${RESET}           Run a performance benchmark
   ${GREEN}update${RESET}              Update OpenClaw and re-sync skills
   ${GREEN}dashboard${RESET}           Show dashboard URLs and start ClawMetry if needed
@@ -82,6 +101,7 @@ ${BOLD}Commands:${RESET}
   ${GREEN}mcp setup${RESET}           Install default MCP servers (diagrams, memory, etc.)
   ${GREEN}mcp add <n> <cmd>${RESET}   Add a custom MCP server
   ${GREEN}mcp remove <n>${RESET}      Remove an MCP server
+  ${GREEN}diagnose${RESET}            Run full system diagnostics (alias: doctor)
   ${GREEN}help${RESET}                Show this help message
 
 USAGE
@@ -108,6 +128,71 @@ _kill_pid_file() {
 _kill_by_name() {
     local pattern="$1"
     pkill -f "${pattern}" 2>/dev/null || true
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  SHARED HELPERS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# _check_service_running LABEL SYSTEMD_UNIT PID_FILE
+#   Prints the status line for a service, checking systemd first then PID file.
+_check_service_running() {
+    local label="$1"
+    local unit="$2"
+    local pid_file="$3"
+    if [[ -f "/etc/systemd/system/${unit}" ]] && \
+       systemctl is-active --quiet "${unit}" 2>/dev/null; then
+        printf '  %s✓%s %-17s running (systemd)\n' "${GREEN}" "${RESET}" "${label}"
+    elif [[ -f "${pid_file}" ]]; then
+        local pid
+        pid=$(cat "${pid_file}" 2>/dev/null || echo "")
+        if [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null; then
+            printf '  %s✓%s %-17s running (PID %s)\n' "${GREEN}" "${RESET}" "${label}" "${pid}"
+        else
+            printf '  %s✗%s %-17s not running (stale PID)\n' "${YELLOW}" "${RESET}" "${label}"
+        fi
+    else
+        printf '  %s-%s %-17s not started\n' "${YELLOW}" "${RESET}" "${label}"
+    fi
+}
+
+_source_gateway_env() {
+    local env_file="${HOME}/.openclaw/gateway.env"
+    if [[ -f "${env_file}" ]]; then
+        local line key val
+        while IFS= read -r line || [[ -n "${line}" ]]; do
+            [[ "${line}" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "${line// }" ]] && continue
+            if [[ "${line}" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*) ]]; then
+                key="${BASH_REMATCH[1]}"
+                val="${BASH_REMATCH[2]}"
+                val="${val%\"}" ; val="${val#\"}"
+                val="${val%\'}" ; val="${val#\'}"
+                export "${key}=${val}"
+            fi
+        done < "${env_file}"
+    fi
+}
+
+_wait_for_ollama() {
+    local attempts=0
+    while (( attempts < 15 )); do
+        if curl -sf http://127.0.0.1:11434/ &>/dev/null; then return 0; fi
+        attempts=$(( attempts + 1 ))
+        sleep 1
+    done
+    log_error "Ollama failed to become ready after 15 seconds."
+    return 1
+}
+
+_detect_systemd() {
+    if ! check_command systemctl; then
+        echo "false"; return
+    fi
+    if systemctl cat clawspark-gateway.service &>/dev/null; then
+        echo "true"; return
+    fi
+    echo "false"
 }
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -143,58 +228,9 @@ _cmd_status() {
         printf '  %s✗%s OpenClaw          not installed\n' "${RED}" "${RESET}"
     fi
 
-    # Gateway
-    local gw_pid_file="${CLAWSPARK_DIR}/gateway.pid"
-    if [[ -f /etc/systemd/system/clawspark-gateway.service ]] && \
-       systemctl is-active --quiet clawspark-gateway.service 2>/dev/null; then
-        printf '  %s✓%s Gateway           running (systemd)\n' "${GREEN}" "${RESET}"
-    elif [[ -f "${gw_pid_file}" ]]; then
-        local gw_pid
-        gw_pid=$(cat "${gw_pid_file}")
-        if kill -0 "${gw_pid}" 2>/dev/null; then
-            printf '  %s✓%s Gateway           running (PID %s)\n' "${GREEN}" "${RESET}" "${gw_pid}"
-        else
-            printf '  %s✗%s Gateway           not running (stale PID)\n' "${YELLOW}" "${RESET}"
-        fi
-    else
-        printf '  %s-%s Gateway           no PID file\n' "${YELLOW}" "${RESET}"
-    fi
-
-    # Node host
-    local node_pid_file="${CLAWSPARK_DIR}/node.pid"
-    if [[ -f /etc/systemd/system/clawspark-nodehost.service ]] && \
-       systemctl is-active --quiet clawspark-nodehost.service 2>/dev/null; then
-        printf '  %s✓%s Node host         running (systemd)\n' "${GREEN}" "${RESET}"
-    elif [[ -f "${node_pid_file}" ]]; then
-        local node_pid
-        node_pid=$(cat "${node_pid_file}")
-        if kill -0 "${node_pid}" 2>/dev/null; then
-            printf '  %s✓%s Node host         running (PID %s)\n' "${GREEN}" "${RESET}" "${node_pid}"
-        else
-            printf '  %s✗%s Node host         not running (stale PID)\n' "${YELLOW}" "${RESET}"
-        fi
-    else
-        printf '  %s-%s Node host         not started\n' "${YELLOW}" "${RESET}"
-    fi
-
-    # Dashboard
-    local dash_pid_file="${CLAWSPARK_DIR}/dashboard.pid"
-    if [[ -f /etc/systemd/system/clawspark-dashboard.service ]] && \
-       systemctl is-active --quiet clawspark-dashboard.service 2>/dev/null; then
-        printf '  %s✓%s Dashboard         running (systemd)\n' "${GREEN}" "${RESET}"
-    elif [[ -f "${dash_pid_file}" ]]; then
-        local dash_pid
-        dash_pid=$(cat "${dash_pid_file}")
-        if kill -0 "${dash_pid}" 2>/dev/null; then
-            printf '  %s✓%s Dashboard         running (PID %s)\n' "${GREEN}" "${RESET}" "${dash_pid}"
-        else
-            printf '  %s✗%s Dashboard         not running (stale PID)\n' "${YELLOW}" "${RESET}"
-        fi
-    elif curl -sf --max-time 2 http://127.0.0.1:8900 &>/dev/null; then
-        printf '  %s✓%s Dashboard         running\n' "${GREEN}" "${RESET}"
-    else
-        printf '  %s-%s Dashboard         not started\n' "${YELLOW}" "${RESET}"
-    fi
+    _check_service_running "Gateway" "clawspark-gateway.service" "${CLAWSPARK_DIR}/gateway.pid"
+    _check_service_running "Node host" "clawspark-nodehost.service" "${CLAWSPARK_DIR}/node.pid"
+    _check_service_running "Dashboard" "clawspark-dashboard.service" "${CLAWSPARK_DIR}/dashboard.pid"
 
     # Skills
     local skill_count=0
@@ -257,9 +293,18 @@ _cmd_skills() {
             [[ -z "${pack_name}" ]] && { _skills_list_packs; return 0; }
             _skills_install_pack "${pack_name}"
             ;;
+        audit)
+            _load_skill_audit
+            if command -v audit_skills &>/dev/null; then
+                audit_skills
+            else
+                log_error "Skill audit module not found. Re-install clawspark."
+                exit 1
+            fi
+            ;;
         *)
             log_error "Unknown skills subcommand: ${subcmd}"
-            printf '  Usage: clawspark skills [sync|add <name>|remove <name>|pack [name]]\n'
+            printf '  Usage: clawspark skills [sync|add <name>|remove <name>|pack [name]|audit]\n'
             exit 1
             ;;
     esac
@@ -274,30 +319,10 @@ _skills_sync() {
 
     log_info "Syncing skills from ${skills_file}..."
 
-    # Parse skill names (supports both "- name: slug" and "- slug" formats)
     local -a skills=()
-    local in_enabled=false
-
-    while IFS= read -r line; do
-        [[ "${line}" =~ ^[[:space:]]*# ]] && continue
-        [[ -z "${line// }" ]] && continue
-
-        if [[ "${line}" =~ enabled:[[:space:]]*$ ]]; then
-            in_enabled=true; continue
-        fi
-        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]{0,3}[a-zA-Z] ]] && [[ ! "${line}" =~ ^[[:space:]]*- ]]; then
-            in_enabled=false; continue
-        fi
-        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+name:[[:space:]]+(.*) ]]; then
-            local slug="${BASH_REMATCH[1]}"; slug="${slug## }"; slug="${slug%% }"
-            skills+=("${slug}"); continue
-        fi
-        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*) ]]; then
-            local slug="${BASH_REMATCH[1]}"; slug="${slug## }"; slug="${slug%% }"
-            [[ "${slug}" =~ ^[a-zA-Z]+: ]] && continue
-            skills+=("${slug}")
-        fi
-    done < "${skills_file}"
+    while IFS= read -r slug; do
+        skills+=("${slug}")
+    done < <(_parse_enabled_skills "${skills_file}")
 
     log_info "Found ${#skills[@]} skill(s). Installing..."
     local installed=0 failed=0
@@ -799,20 +824,9 @@ _cmd_logs() {
 # ── restart ─────────────────────────────────────────────────────────────────
 _cmd_restart() {
     log_info "Restarting services..."
-
-    # Source gateway env (safely -- never let set -a leak)
-    local env_file="${HOME}/.openclaw/gateway.env"
-    if [[ -f "${env_file}" ]]; then
-        set +e; set -a; source "${env_file}" 2>/dev/null; set +a; set -e
-    fi
-
-    # Detect if systemd is managing our services
-    local use_systemd=false
-    if check_command systemctl && systemctl is-active --quiet clawspark-gateway.service 2>/dev/null; then
-        use_systemd=true
-    elif check_command systemctl && systemctl is-enabled --quiet clawspark-gateway.service 2>/dev/null; then
-        use_systemd=true
-    fi
+    _source_gateway_env
+    local use_systemd
+    use_systemd=$(_detect_systemd)
 
     # Restart Ollama
     if check_command systemctl && systemctl is-enabled ollama &>/dev/null; then
@@ -835,16 +849,12 @@ _cmd_restart() {
         log_success "Ollama started (PID $!)."
     fi
 
-    # Wait for Ollama API
-    local attempts=0
-    while (( attempts < 15 )); do
-        if curl -sf http://127.0.0.1:11434/ &>/dev/null; then break; fi
-        attempts=$(( attempts + 1 ))
-        sleep 1
-    done
+    if ! _wait_for_ollama; then
+        log_error "Aborting: Ollama backend is not ready."
+        return 1
+    fi
 
     if [[ "${use_systemd}" == "true" ]]; then
-        # Let systemd handle the restart
         sudo -n systemctl restart clawspark-gateway.service 2>/dev/null || {
             log_warn "Gateway needs sudo to restart. Run: sudo systemctl restart clawspark-gateway"
         }
@@ -893,18 +903,9 @@ _cmd_restart() {
 # ── start ──────────────────────────────────────────────────────────────────
 _cmd_start() {
     log_info "Starting services..."
-
-    # Source gateway env (safely)
-    local env_file="${HOME}/.openclaw/gateway.env"
-    if [[ -f "${env_file}" ]]; then
-        set +e; set -a; source "${env_file}" 2>/dev/null; set +a; set -e
-    fi
-
-    # Detect systemd management
-    local use_systemd=false
-    if check_command systemctl && systemctl is-enabled --quiet clawspark-gateway.service 2>/dev/null; then
-        use_systemd=true
-    fi
+    _source_gateway_env
+    local use_systemd
+    use_systemd=$(_detect_systemd)
 
     # Start Ollama
     if curl -sf http://127.0.0.1:11434/ &>/dev/null; then
@@ -917,16 +918,12 @@ _cmd_start() {
         log_success "Ollama started (PID $!)."
     fi
 
-    # Wait for Ollama API
-    local attempts=0
-    while (( attempts < 15 )); do
-        if curl -sf http://127.0.0.1:11434/ &>/dev/null; then break; fi
-        attempts=$(( attempts + 1 ))
-        sleep 1
-    done
+    if ! _wait_for_ollama; then
+        log_error "Aborting: Ollama backend is not ready."
+        return 1
+    fi
 
     if [[ "${use_systemd}" == "true" ]]; then
-        # Use systemd
         if systemctl is-active --quiet clawspark-gateway.service 2>/dev/null; then
             log_info "Gateway already running (systemd)."
         else
@@ -1100,26 +1097,20 @@ _model_list() {
     local primary_model="" vision_model="" imagegen_model=""
 
     if [[ -f "${config_file}" ]]; then
-        primary_model=$(python3 -c "
+        local models_output
+        models_output=$(python3 -c "
 import json, sys
 with open(sys.argv[1]) as f:
-    cfg = json.load(f)
-print(cfg.get('agents', {}).get('defaults', {}).get('model', ''))
+    d = json.load(f).get('agents', {}).get('defaults', {})
+print(d.get('model', ''))
+print(d.get('imageModel', ''))
+print(d.get('imageGenerationModel', ''))
 " "${config_file}" 2>/dev/null || echo "")
-
-        vision_model=$(python3 -c "
-import json, sys
-with open(sys.argv[1]) as f:
-    cfg = json.load(f)
-print(cfg.get('agents', {}).get('defaults', {}).get('imageModel', ''))
-" "${config_file}" 2>/dev/null || echo "")
-
-        imagegen_model=$(python3 -c "
-import json, sys
-with open(sys.argv[1]) as f:
-    cfg = json.load(f)
-print(cfg.get('agents', {}).get('defaults', {}).get('imageGenerationModel', ''))
-" "${config_file}" 2>/dev/null || echo "")
+        if [[ -n "${models_output}" ]]; then
+            primary_model=$(echo "${models_output}" | sed -n '1p')
+            vision_model=$(echo "${models_output}" | sed -n '2p')
+            imagegen_model=$(echo "${models_output}" | sed -n '3p')
+        fi
     fi
 
     printf '  %s%sActive Models:%s\n\n' "${BOLD}" "${GREEN}" "${RESET}"
@@ -1747,6 +1738,15 @@ case "${cmd}" in
     stop)       _cmd_stop "$@" ;;
     restart)    _cmd_restart ;;
     uninstall)  _cmd_uninstall ;;
+    diagnose|doctor)
+        _load_diagnose
+        if command -v diagnose_system &>/dev/null; then
+            diagnose_system
+        else
+            log_error "Diagnose module not found. Re-install clawspark."
+            exit 1
+        fi
+        ;;
     help|-h|--help) _usage ;;
     version|--version|-v) echo "clawspark v${CLAWSPARK_VERSION}" ;;
     *)

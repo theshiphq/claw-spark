@@ -466,6 +466,120 @@
       color: #555;
     }
 
+    .arch-visual {
+      max-width: 680px;
+      margin: 0 auto 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #2a2a2a;
+      background: #0f0f0f;
+    }
+
+    .arch-layer {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 28px 24px 20px;
+    }
+
+    .arch-layer + .arch-layer {
+      border-top: 1px solid #222;
+    }
+
+    .arch-layer-label {
+      position: absolute;
+      top: 6px;
+      left: 14px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #555;
+    }
+
+    .arch-arrow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 28px;
+      color: #444;
+      font-size: 0.75rem;
+      position: relative;
+    }
+
+    .arch-arrow::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(to bottom, #333, #76b900);
+      transform: translateX(-50%);
+    }
+
+    .arch-arrow::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #76b900;
+    }
+
+    .arch-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #161616;
+      min-width: 90px;
+      text-align: center;
+      transition: all 0.25s ease;
+    }
+
+    .arch-node:hover {
+      border-color: #76b900;
+      background: rgba(118, 185, 0, 0.06);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(118, 185, 0, 0.1);
+    }
+
+    .arch-node-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #ddd;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .arch-node-desc {
+      font-size: 0.65rem;
+      color: #666;
+    }
+
+    .arch-node.primary { border-color: rgba(118, 185, 0, 0.25); background: rgba(118, 185, 0, 0.04); }
+    .arch-node.primary .arch-node-name { color: #76b900; }
+    .arch-node.accent { border-color: rgba(255, 107, 53, 0.25); background: rgba(255, 107, 53, 0.04); }
+    .arch-node.accent .arch-node-name { color: #ff6b35; }
+    .arch-node.wide { flex: 1; max-width: 100%; }
+
+    @media (max-width: 640px) {
+      .arch-node { min-width: 75px; padding: 8px 10px; }
+      .arch-node-name { font-size: 0.7rem; }
+    }
+
     .stat-boxes {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1088,6 +1202,22 @@
           <h3>Survives Reboots</h3>
           <p>Systemd services auto-start everything on boot. Gateway, node host, dashboard, Ollama. No manual restarts, ever.</p>
         </div>
+
+        <div class="feature-card fade-in">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <h3>Skill Security Audit</h3>
+          <p>Scans installed skills for malicious patterns: credential theft, network exfiltration, obfuscation. Protects against the 341+ malicious ClawHub skills found in the wild.</p>
+        </div>
+
+        <div class="feature-card fade-in">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <h3>Built-in Diagnostics</h3>
+          <p>Run <code style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:#76b900;background:rgba(118,185,0,0.08);padding:1px 6px;border-radius:4px;">clawspark diagnose</code> for a full system health check: GPU, Ollama, OpenClaw, skills, ports, security, and logs. Shareable debug reports.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -1156,6 +1286,15 @@
         </div>
         <div class="security-item fade-in">
           <div class="security-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="security-content">
+            <h3>Skill Audit</h3>
+            <p>Scans skills for 30+ malicious patterns (credential theft, exfiltration, obfuscation). Tracks file hashes to detect tampering. Curated allowlist of verified skills.</p>
+          </div>
+        </div>
+        <div class="security-item fade-in">
+          <div class="security-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <div class="security-content">
@@ -1174,25 +1313,105 @@
         <h2 class="section-title">Architecture</h2>
         <p class="section-subtitle">A clean stack from messaging layer to GPU. Everything runs locally on a single machine.</p>
       </div>
-      <div class="arch-diagram fade-in">
-        <div class="terminal-dots">
-          <span></span><span></span><span></span>
+      <div class="arch-visual fade-in">
+        <div class="arch-layer">
+          <span class="arch-layer-label">Channels</span>
+          <div class="arch-node accent">
+            <span class="arch-node-name">WhatsApp</span>
+            <span class="arch-node-desc">Baileys</span>
+          </div>
+          <div class="arch-node accent">
+            <span class="arch-node-name">Telegram</span>
+            <span class="arch-node-desc">Bot API</span>
+          </div>
+          <div class="arch-node accent">
+            <span class="arch-node-name">Web UI</span>
+            <span class="arch-node-desc">:18789</span>
+          </div>
+          <div class="arch-node accent">
+            <span class="arch-node-name">Voice</span>
+            <span class="arch-node-desc">Whisper</span>
+          </div>
         </div>
-        <pre>
-  <span class="arch-accent">WhatsApp</span> <span class="arch-dim">/</span> <span class="arch-accent">Telegram</span> <span class="arch-dim">/</span> <span class="arch-accent">Web UI</span> <span class="arch-dim">/</span> <span class="arch-accent">Voice</span>
-           <span class="arch-dim">|</span>
-  <span class="arch-highlight">OpenClaw Gateway</span>  <span class="arch-dim">(port 18789)</span>
-    <span class="arch-dim">|              |            |           |</span>
-  <span class="arch-highlight">Agent</span>          <span class="arch-highlight">Node Host</span>    <span class="arch-highlight">Baileys</span>      <span class="arch-highlight">Sub-Agents</span>
-  <span class="arch-dim">(LLM)</span>         <span class="arch-dim">(28+ tools)</span>  <span class="arch-dim">(WhatsApp)</span>   <span class="arch-dim">(parallel)</span>
-    <span class="arch-dim">|              |              |</span>
-  <span class="arch-highlight">Ollama</span>       <span class="arch-dim">exec, browser,</span>   <span class="arch-highlight">MCP Servers</span>
-  <span class="arch-dim">(port 11434)</span>  <span class="arch-dim">read, write,</span>     <span class="arch-dim">(mcporter)</span>
-    <span class="arch-dim">|</span>           <span class="arch-dim">web_search,</span>      <span class="arch-dim">|</span>
-  <span class="arch-accent">Chat Model</span>  <span class="arch-dim">vision</span>      <span class="arch-dim">Mermaid, Memory,</span>
-  <span class="arch-dim">+ Vision</span>        <span class="arch-dim">|</span>        <span class="arch-dim">Filesystem, Thinking</span>
-  <span class="arch-dim">(GB10 GPU)</span>  <span class="arch-highlight">Docker Sandbox</span>
-              <span class="arch-dim">(isolated exec)</span></pre>
+
+        <div class="arch-arrow"></div>
+
+        <div class="arch-layer">
+          <span class="arch-layer-label">Gateway</span>
+          <div class="arch-node primary wide">
+            <span class="arch-node-name">OpenClaw Gateway</span>
+            <span class="arch-node-desc">Routing, auth, tool dispatch (port 18789)</span>
+          </div>
+        </div>
+
+        <div class="arch-arrow"></div>
+
+        <div class="arch-layer">
+          <span class="arch-layer-label">Runtime</span>
+          <div class="arch-node primary">
+            <span class="arch-node-name">Agent</span>
+            <span class="arch-node-desc">LLM reasoning</span>
+          </div>
+          <div class="arch-node">
+            <span class="arch-node-name">Node Host</span>
+            <span class="arch-node-desc">28+ tools</span>
+          </div>
+          <div class="arch-node">
+            <span class="arch-node-name">Sub-Agents</span>
+            <span class="arch-node-desc">Parallel tasks</span>
+          </div>
+          <div class="arch-node primary">
+            <span class="arch-node-name">MCP Servers</span>
+            <span class="arch-node-desc">Memory, Diagrams</span>
+          </div>
+        </div>
+
+        <div class="arch-arrow"></div>
+
+        <div class="arch-layer">
+          <span class="arch-layer-label">Tools</span>
+          <div class="arch-node">
+            <span class="arch-node-name">exec</span>
+          </div>
+          <div class="arch-node">
+            <span class="arch-node-name">browser</span>
+          </div>
+          <div class="arch-node">
+            <span class="arch-node-name">read/write</span>
+          </div>
+          <div class="arch-node">
+            <span class="arch-node-name">web_search</span>
+          </div>
+          <div class="arch-node">
+            <span class="arch-node-name">vision</span>
+          </div>
+          <div class="arch-node accent">
+            <span class="arch-node-name">Sandbox</span>
+            <span class="arch-node-desc">Isolated Docker</span>
+          </div>
+        </div>
+
+        <div class="arch-arrow"></div>
+
+        <div class="arch-layer">
+          <span class="arch-layer-label">Inference</span>
+          <div class="arch-node primary">
+            <span class="arch-node-name">Ollama</span>
+            <span class="arch-node-desc">:11434</span>
+          </div>
+          <div class="arch-node primary">
+            <span class="arch-node-name">Chat Model</span>
+            <span class="arch-node-desc">Qwen 3.5 35B</span>
+          </div>
+          <div class="arch-node accent">
+            <span class="arch-node-name">Vision Model</span>
+            <span class="arch-node-desc">Qwen VL 7B</span>
+          </div>
+          <div class="arch-node">
+            <span class="arch-node-name">GB10 GPU</span>
+            <span class="arch-node-desc">128 GB unified</span>
+          </div>
+        </div>
       </div>
       <div class="stat-boxes">
         <div class="stat-box fade-in">

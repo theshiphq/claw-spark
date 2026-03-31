@@ -216,3 +216,34 @@ print_box() {
     done
     printf '%s└%s┘%s\n' "${BLUE}" "$(printf '─%.0s' $(seq 1 "${pad}"))" "${RESET}"
 }
+
+# ── Skills YAML parser ────────────────────────────────────────────────────
+# _parse_enabled_skills FILE
+#   Prints one skill slug per line from the "enabled:" section.
+#   Handles both "- name: slug" and "- slug" formats.
+_parse_enabled_skills() {
+    local skills_file="$1"
+    [[ -f "${skills_file}" && -r "${skills_file}" ]] || return 1
+    local in_enabled=false
+
+    while IFS= read -r line; do
+        [[ "${line}" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line// }" ]] && continue
+
+        if [[ "${line}" =~ enabled:[[:space:]]*$ ]]; then
+            in_enabled=true; continue
+        fi
+        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]{0,3}[a-zA-Z] ]] && [[ ! "${line}" =~ ^[[:space:]]*- ]]; then
+            in_enabled=false; continue
+        fi
+        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+name:[[:space:]]+(.*) ]]; then
+            local slug="${BASH_REMATCH[1]}"; slug="${slug## }"; slug="${slug%% }"
+            echo "${slug}"; continue
+        fi
+        if ${in_enabled} && [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*) ]]; then
+            local slug="${BASH_REMATCH[1]}"; slug="${slug## }"; slug="${slug%% }"
+            [[ "${slug}" =~ ^[a-zA-Z]+: ]] && continue
+            echo "${slug}"
+        fi
+    done < "${skills_file}"
+}
