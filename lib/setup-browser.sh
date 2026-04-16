@@ -8,10 +8,14 @@ setup_browser() {
     log_info "Setting up browser automation..."
 
     local browser_bin=""
-    if check_command chromium-browser; then
-        browser_bin="chromium-browser"
+    # Prefer the real snap binary over the apt transitional stub, which can
+    # fail under systemd/headless contexts even when it resolves on PATH.
+    if [[ -x /snap/bin/chromium ]]; then
+        browser_bin="/snap/bin/chromium"
     elif check_command chromium; then
         browser_bin="chromium"
+    elif check_command chromium-browser; then
+        browser_bin="chromium-browser"
     elif check_command google-chrome; then
         browser_bin="google-chrome"
     elif check_command google-chrome-stable; then
@@ -39,33 +43,41 @@ setup_browser() {
     else
         log_info "No browser found. Installing Chromium for browser automation..."
         if check_command apt-get; then
-            # Ubuntu 20.04+ and Jetson: apt chromium-browser installs a snap stub
-            # that doesn't work headless or under systemd. Prefer google-chrome.
-            local _snap_chromium=false
-            if command -v snap &>/dev/null && snap list chromium &>/dev/null 2>&1; then
-                _snap_chromium=true
+            # On Ubuntu 22.04+ (DGX Spark, Jetson, modern desktop), `apt install
+            # chromium-browser` only drops a snap transitional stub. On ARM64 there
+            # is no `chromium` apt package and no ARM64 google-chrome build at all,
+            # so the old fallback chain silently installs a broken stub.
+            # `snap install chromium` is the supported path across all arches.
+            if ! check_command snap; then
+                log_info "snapd not found. Installing..."
+                (sudo apt-get update && sudo apt-get install -y snapd) >> "${CLAWSPARK_LOG}" 2>&1 &
+                spinner $! "Installing snapd..."
+                # snapd needs a moment to seed on a fresh box
+                sudo snap wait system seed.loaded >> "${CLAWSPARK_LOG}" 2>&1 || true
             fi
-            if [[ "${_snap_chromium}" == "true" ]] || dpkg -l chromium-browser 2>/dev/null | grep -q "^ii.*snap"; then
-                log_warn "Snap Chromium detected (broken for headless/systemd). Trying Google Chrome..."
+            if check_command snap; then
+                (sudo snap install chromium) >> "${CLAWSPARK_LOG}" 2>&1 &
+                spinner $! "Installing Chromium (snap)..."
+                if [[ -x /snap/bin/chromium ]] && /snap/bin/chromium --version >> "${CLAWSPARK_LOG}" 2>&1; then
+                    browser_bin="/snap/bin/chromium"
+                fi
             fi
-            # Try Google Chrome first (always works headless)
-            if ! check_command google-chrome-stable && ! check_command google-chrome; then
-                (sudo apt-get install -y chromium-browser 2>/dev/null || sudo apt-get install -y chromium) >> "${CLAWSPARK_LOG}" 2>&1 &
-                spinner $! "Installing Chromium..."
-            fi
-            if check_command google-chrome-stable; then
-                browser_bin="google-chrome-stable"
-            elif check_command google-chrome; then
-                browser_bin="google-chrome"
-            elif check_command chromium-browser; then
-                browser_bin="chromium-browser"
-            elif check_command chromium; then
-                browser_bin="chromium"
+            # Fallback: x86_64 boxes without snap can try apt chromium directly
+            if [[ -z "${browser_bin}" ]] && [[ "$(uname -m)" != "aarch64" ]]; then
+                (sudo apt-get install -y chromium 2>/dev/null || sudo apt-get install -y chromium-browser) >> "${CLAWSPARK_LOG}" 2>&1 &
+                spinner $! "Installing Chromium (apt fallback)..."
+                for candidate in chromium chromium-browser google-chrome-stable google-chrome; do
+                    if check_command "${candidate}" && "${candidate}" --version >> "${CLAWSPARK_LOG}" 2>&1; then
+                        browser_bin="${candidate}"
+                        break
+                    fi
+                done
             fi
             if [[ -n "${browser_bin}" ]]; then
                 log_success "Browser installed: ${browser_bin}"
             else
                 log_warn "Browser installation failed. Browser tool will not be available."
+                log_warn "Manual install: sudo snap install chromium"
                 return 0
             fi
         elif check_command brew; then
